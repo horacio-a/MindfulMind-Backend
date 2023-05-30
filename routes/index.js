@@ -6,7 +6,7 @@ var db = require('../models/dbInteraction')
 const { response } = require('express');
 
 
-router.get('/newtask/:token', async function (req, res, next) {
+router.post('/newtask/:token', async function (req, res, next) {
     const timeStamp = new Date().getTime()
     const Data = req.body
     console.log(Data)
