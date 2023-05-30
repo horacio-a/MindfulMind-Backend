@@ -4,6 +4,7 @@ var router = express.Router();
 var axios = require('axios');
 var db = require('../models/dbInteraction')
 const { response } = require('express');
+const { use } = require('../app');
 
 
 router.post('/newtask/:token', async function (req, res, next) {
@@ -20,6 +21,12 @@ router.post('/newtask/:token', async function (req, res, next) {
     // db.InsertNewTask(newTask)
 
 });
+
+router.get('/task/:users', async function (req, res, next) {
+    const user = req.params.users
+    const data = await db.GetTaskByUsers(user)
+    res.json(data)
+})
 
 
 

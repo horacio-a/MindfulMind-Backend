@@ -12,6 +12,16 @@ async function InsertNewTask(obj) {
     }
 }
 
+async function GetTaskByUsers(user) {
+    try {
+        var query = 'select * from tasks WHERE user = ?'
+        var rows = await pool.query(query, [user])
+        return rows
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 
 async function getLastRegistroHorario() {
     try {
@@ -127,4 +137,4 @@ async function getNamebyid(code) {
 }
 
 
-module.exports = { InsertNewTask }
+module.exports = { InsertNewTask, GetTaskByUsers }
