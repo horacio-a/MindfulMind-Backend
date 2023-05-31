@@ -11,14 +11,14 @@ router.post('/newtask/:token', async function (req, res, next) {
     const timeStamp = new Date().getTime()
     const Data = req.body
     console.log(Data)
-    // const newTask = {
-    //     user: 'horacio',
-    //     tasksName: 'Ir al gimnasio',
-    //     completed: 0,
-    //     updateDate: timeStamp
-    // }
+    const newTask = {
+        user: 'horacio',
+        tasksName: 'Ir al gimnasio',
+        completed: 0,
+        updateDate: timeStamp
+    }
 
-    // db.InsertNewTask(newTask)
+    db.InsertNewTask(newTask)
 
 });
 
