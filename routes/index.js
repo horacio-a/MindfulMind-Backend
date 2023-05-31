@@ -32,7 +32,7 @@ router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
     function obtenerDiasDelMes() {
         const fechaActual = new Date(); // Obtener la fecha actual
         const año = fechaActual.getFullYear(); // Obtener el año actual
-        const mes = 3; // Obtener el mes actual (0-11)
+        const mes = fechaActual.getMonth(); // Obtener el mes actual (0-11)
 
         const primerDia = new Date(año, mes, 1); // Crear una fecha con el primer día del mes
         const ultimoDia = new Date(año, mes + 1, 0); // Crear una fecha con el último día del mes
