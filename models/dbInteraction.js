@@ -1,5 +1,6 @@
 const { route } = require('../routes')
 var pool = require('./db')
+var md5 = require('md5');
 
 
 async function InsertNewTask(obj) {
@@ -17,6 +18,16 @@ async function GetTaskByUsers(user) {
         var query = 'select * from tasks WHERE user = ?'
         var rows = await pool.query(query, [user])
         return rows
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function GetLoginByUserAndPassword(user, password) {
+    try {
+        var query = 'select * from users WHERE user = ? and password = ?'
+        var rows = await pool.query(query, [user, md5(password)])
+        return rows[0]
     } catch (error) {
         console.log(error)
     }
@@ -137,4 +148,4 @@ async function getNamebyid(code) {
 }
 
 
-module.exports = { InsertNewTask, GetTaskByUsers }
+module.exports = { InsertNewTask, GetTaskByUsers, GetLoginByUserAndPassword }

@@ -110,4 +110,22 @@ router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
 
 
 
+router.post('/login', async function (req, res, next) {
+    const user = req.body.user
+    const password = req.body.password
+    const data = await db.GetLoginByUserAndPassword(user, password)
+    if (data !== undefined) {
+        res.json({
+            authentication: true,
+        })
+    } else {
+        res.json({
+            authentication: false,
+        })
+    }
+
+
+})
+
+
 module.exports = router;
