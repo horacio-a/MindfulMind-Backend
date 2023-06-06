@@ -34,6 +34,16 @@ async function GetLoginByUserAndPassword(user, password) {
 }
 
 
+async function InsertUser(obj) {
+    try {
+        var query = 'insert into users set ?';
+        var rows = await pool.query(query, [obj])
+        return rows
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 async function getLastRegistroHorario() {
     try {
         var query = 'select * from registro_horarios limit 1'
@@ -148,4 +158,4 @@ async function getNamebyid(code) {
 }
 
 
-module.exports = { InsertNewTask, GetTaskByUsers, GetLoginByUserAndPassword }
+module.exports = { InsertUser, InsertNewTask, GetTaskByUsers, GetLoginByUserAndPassword }

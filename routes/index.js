@@ -128,4 +128,13 @@ router.post('/login', async function (req, res, next) {
 })
 
 
+router.post('/register', async function (req, res, next) {
+    const obj = JSON.parse(req.body.obj)
+    console.log(obj)
+    let response = await db.InsertUser(obj)
+    console.log(response)
+})
+
+
+
 module.exports = router;
