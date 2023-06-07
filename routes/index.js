@@ -131,6 +131,7 @@ router.post('/login', async function (req, res, next) {
 router.post('/register', async function (req, res, next) {
     const data = JSON.parse(req.body.obj)
     const check = await db.checkExistence(data.user, data.email)
+    console.log(check)
     if (check[0] === undefined) {
         console.log(data)
         let obj = {
@@ -140,7 +141,12 @@ router.post('/register', async function (req, res, next) {
         }
         console.log(obj)
         let response = await db.InsertUser(obj)
+        res.json({ response, userCreate: true })
         console.log(response)
+    } else {
+        if (check[0].user == data.user) { res.json({ Error: 'usuario', userCreate: false }) }
+        if (check[0].email == data.email) { res.json({ Error: 'email', userCreate: false }) }
+
     }
 
 })
