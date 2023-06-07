@@ -34,6 +34,17 @@ async function GetLoginByUserAndPassword(user, password) {
 }
 
 
+async function checkExistence(user, email) {
+    try {
+        var query = 'SELECT * FROM users WHERE user = ? OR email = ?';
+        var rows = await pool.query(query, [user, email])
+        return rows
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
 async function InsertUser(obj) {
     try {
         var query = 'insert into users set ?';
@@ -158,4 +169,4 @@ async function getNamebyid(code) {
 }
 
 
-module.exports = { InsertUser, InsertNewTask, GetTaskByUsers, GetLoginByUserAndPassword }
+module.exports = { InsertUser, InsertNewTask, GetTaskByUsers, GetLoginByUserAndPassword, checkExistence }

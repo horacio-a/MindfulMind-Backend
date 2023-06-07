@@ -130,15 +130,19 @@ router.post('/login', async function (req, res, next) {
 
 router.post('/register', async function (req, res, next) {
     const data = JSON.parse(req.body.obj)
-    console.log(data)
-    let obj = {
-        user: data.user,
-        password: data.password,
-        email: data.email
+    const check = await db.checkExistence(data.user, data.email)
+    if (check[0] === undefined) {
+        console.log(data)
+        let obj = {
+            user: data.user,
+            password: data.password,
+            email: data.email
+        }
+        console.log(obj)
+        let response = await db.InsertUser(obj)
+        console.log(response)
     }
-    console.log(obj)
-    let response = await db.InsertUser(obj)
-    console.log(response)
+
 })
 
 
