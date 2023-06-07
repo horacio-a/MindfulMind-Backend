@@ -123,8 +123,6 @@ router.post('/login', async function (req, res, next) {
             authentication: false,
         })
     }
-
-
 })
 
 
@@ -144,9 +142,14 @@ router.post('/register', async function (req, res, next) {
         res.json({ response, userCreate: true })
         console.log(response)
     } else {
-        if (check[0].user == data.user) { res.json({ Error: 'usuario', userCreate: false }) }
-        if (check[0].email == data.email) { res.json({ Error: 'email', userCreate: false }) }
-
+        let ErrorResponse = { error: [], userCreate: false }
+        if (check[0].user == data.user) {
+            ErrorResponse.error.push('usuario')
+        }
+        if (check[0].email == data.email) {
+            ErrorResponse.error.push('email')
+        }
+        res.json(ErrorResponse)
     }
 
 })
