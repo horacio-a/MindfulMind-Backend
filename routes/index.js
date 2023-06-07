@@ -5,6 +5,7 @@ var axios = require('axios');
 var db = require('../models/dbInteraction')
 const { response } = require('express');
 const { use } = require('../app');
+var md5 = require('md5');
 
 
 router.post('/newtask/:token', async function (req, res, next) {
@@ -134,7 +135,7 @@ router.post('/register', async function (req, res, next) {
         console.log(data)
         let obj = {
             user: data.user,
-            password: data.password,
+            password: md5(data.password),
             email: data.email
         }
         console.log(obj)
