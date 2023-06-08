@@ -143,12 +143,12 @@ router.post('/register', async function (req, res, next) {
         res.json({ response, userCreate: true })
         console.log(response)
     } else {
-        let ErrorResponse = { error: [], userCreate: false }
+        let ErrorResponse = { error: { email: false, user: false }, userCreate: false }
         if (check[0].user == data.user) {
-            ErrorResponse.error.push('usuario')
+            ErrorResponse.error.user = true
         }
         if (check[0].email == data.email) {
-            ErrorResponse.error.push('email')
+            ErrorResponse.error.email = true
         }
         res.json(ErrorResponse)
     }
