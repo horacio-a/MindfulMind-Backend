@@ -55,6 +55,15 @@ async function InsertUser(obj) {
     }
 }
 
+async function getCalendarTaskByUser(user) {
+    try {
+        var query = 'SELECT * FROM calendar WHERE USER = ?';
+        var rows = await pool.query(query, [user])
+        return rows
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 
 
@@ -70,4 +79,4 @@ async function deleteAllInfo() {
 
 
 
-module.exports = { InsertUser, InsertNewTask, GetTaskByUsers, GetLoginByUserAndPassword, checkExistence }
+module.exports = { getCalendarTaskByUser, InsertUser, InsertNewTask, GetTaskByUsers, GetLoginByUserAndPassword, checkExistence }

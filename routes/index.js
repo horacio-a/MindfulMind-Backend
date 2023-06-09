@@ -30,6 +30,11 @@ router.get('/task/:users', async function (req, res, next) {
 })
 
 router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
+    const user = req.params.user
+    const idCalendar = req.params.idCalendar
+    const calendarTasks = await db.getCalendarTaskByUser(user, idCalendar)
+    console.log(calendarTasks)
+
     function obtenerDiasDelMes() {
         let ID = 1
         const fechaActual = new Date(); // Obtener la fecha actual
@@ -43,15 +48,30 @@ router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
 
         // Recorrer desde el primer día hasta el último día del mes
         for (let i = primerDia.getDate(); i <= ultimoDia.getDate(); i++) {
-
+            let taresEsteDia = false
             const fecha = new Date(año, mes, i); // Crear una fecha con el día actual
             const diaSemana = fecha.toLocaleDateString('es-ES', { weekday: 'long' }); // Obtener el día de la semana como una cadena de texto
-            if (fecha.getDate() == fechaActual.getDate()) {
-                diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: true }); // Agregar el día y el día de la semana al array
-            } else {
-                diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: false }); // Agregar el día y el día de la semana al array
-
+            for (let index = 0; index < calendarTasks.length; index++) {
+                const element = calendarTasks[index];
+                taksDate = new Date(element.date)
+                if (taksDate.getDate() == fecha.getDate()) {
+                    taresEsteDia = true
+                }
             }
+            if (fecha.getDate() == fechaActual.getDate()) {
+                if (taresEsteDia === true) {
+                    diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: true, requestTask: true });
+                } else {
+                    diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: true, requestTask: false });
+                }
+            } else {
+                if (taresEsteDia === true) {
+                    diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: false, requestTask: true });
+                } else {
+                    diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: false, requestTask: false });
+                }
+            }
+            taresEsteDia = false
             ID = ID + 1
         }
 
@@ -114,8 +134,10 @@ router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
 
     const calendar = {
         data: { month: mes, year: año },
-        days: obtenerDiasDelMes()
+        days: obtenerDiasDelMes(),
     }
+
+
 
     res.json(calendar)
 })
@@ -165,6 +187,7 @@ router.post('/register', async function (req, res, next) {
     }
 
 })
+
 
 
 
