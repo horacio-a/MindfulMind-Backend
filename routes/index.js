@@ -31,6 +31,7 @@ router.get('/task/:users', async function (req, res, next) {
 
 router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
     function obtenerDiasDelMes() {
+        let ID = 1
         const fechaActual = new Date(); // Obtener la fecha actual
         const año = fechaActual.getFullYear(); // Obtener el año actual
         const mes = fechaActual.getMonth(); // Obtener el mes actual (0-11)
@@ -42,9 +43,16 @@ router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
 
         // Recorrer desde el primer día hasta el último día del mes
         for (let i = primerDia.getDate(); i <= ultimoDia.getDate(); i++) {
+
             const fecha = new Date(año, mes, i); // Crear una fecha con el día actual
             const diaSemana = fecha.toLocaleDateString('es-ES', { weekday: 'long' }); // Obtener el día de la semana como una cadena de texto
-            diasDelMes.push({ number: i, diaSemana, fecha, ThisMount: true }); // Agregar el día y el día de la semana al array
+            if (fecha.getDate() == fechaActual.getDate()) {
+                diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: true }); // Agregar el día y el día de la semana al array
+            } else {
+                diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: false }); // Agregar el día y el día de la semana al array
+
+            }
+            ID = ID + 1
         }
 
         const diasDeLaSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado']
@@ -64,7 +72,9 @@ router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
                     const fechaAtras = new Date(fecha); // Crear una nueva instancia de Date con la fecha dada
                     fechaAtras.setDate(fechaAtras.getDate() - i); // Restar "i" días a la fecha dada
                     const diaSemana = fechaAtras.toLocaleDateString('es-ES', { weekday: 'long' });
-                    diasDelMes.unshift({ number: fechaAtras.getDate(), diaSemana, fechaAtras, ThisMount: false });
+                    diasDelMes.unshift({ id: ID, number: fechaAtras.getDate(), diaSemana, fechaAtras, ThisMount: false, Today: false });
+                    ID = ID + 1
+
                 }
             }
         }
@@ -76,14 +86,15 @@ router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
                     const fechaAtras = new Date(fecha); // Crear una nueva instancia de Date con la fecha dada
                     fechaAtras.setDate(fechaAtras.getDate() + i); // Restar "i" días a la fecha dada
                     const diaSemana = fechaAtras.toLocaleDateString('es-ES', { weekday: 'long' });
-                    diasDelMes.push({ number: fechaAtras.getDate(), diaSemana, fechaAtras, ThisMount: false });
+                    diasDelMes.push({ id: ID, number: fechaAtras.getDate(), diaSemana, fechaAtras, ThisMount: false, Today: false });
+                    ID = ID + 1
+
                 }
             }
         }
         const numPosterior = 42 - diasDelMes.length //  se obtiene el numero de dias que se necesita para rellenar el calendario
 
         obtenerDiasDelante(diasDelMes[diasDelMes.length - 1].fecha, numPosterior)
-
 
 
 
