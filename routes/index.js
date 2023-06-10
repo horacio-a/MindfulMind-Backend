@@ -54,7 +54,7 @@ router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
             for (let index = 0; index < calendarTasks.length; index++) {
                 const element = calendarTasks[index];
                 taksDate = new Date(element.date)
-                if (taksDate.getDate() == fecha.getDate()) {
+                if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
                     taresEsteDia = true
                 }
             }
@@ -89,11 +89,23 @@ router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
         function obtenerDiasAtras(fecha, cantidadDias) {
             if (cantidadDias != 0) {
                 for (let i = 1; i < cantidadDias + 1; i++) {
+                    let taresEsteDia = false
                     const fechaAtras = new Date(fecha); // Crear una nueva instancia de Date con la fecha dada
                     fechaAtras.setDate(fechaAtras.getDate() - i); // Restar "i" días a la fecha dada
                     const diaSemana = fechaAtras.toLocaleDateString('es-ES', { weekday: 'long' });
-                    diasDelMes.unshift({ id: ID, number: fechaAtras.getDate(), diaSemana, fechaAtras, ThisMount: false, Today: false });
+                    for (let index = 0; index < calendarTasks.length; index++) {
+                        taksDate = new Date(calendarTasks[index].date)
+                        if (taksDate.getDate() == fechaAtras.getDate() && taksDate.getMonth() == fechaAtras.getMonth()) {
+                            taresEsteDia = true
+                        }
+                    }
+                    if (taresEsteDia === true) {
+                        diasDelMes.unshift({ id: ID, number: fechaAtras.getDate(), diaSemana, fechaAtras, ThisMount: false, Today: false, requestTask: true });
+                    } else {
+                        diasDelMes.unshift({ id: ID, number: fechaAtras.getDate(), diaSemana, fechaAtras, ThisMount: false, Today: false, requestTask: false });
+                    }
                     ID = ID + 1
+                    taresEsteDia = false
 
                 }
             }
@@ -103,11 +115,24 @@ router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
         function obtenerDiasDelante(fecha, cantidadDias) {
             if (cantidadDias != 0) {
                 for (let i = 1; i < cantidadDias + 1; i++) {
+                    let taresEsteDia = false
                     const fechaAtras = new Date(fecha); // Crear una nueva instancia de Date con la fecha dada
                     fechaAtras.setDate(fechaAtras.getDate() + i); // Restar "i" días a la fecha dada
                     const diaSemana = fechaAtras.toLocaleDateString('es-ES', { weekday: 'long' });
-                    diasDelMes.push({ id: ID, number: fechaAtras.getDate(), diaSemana, fechaAtras, ThisMount: false, Today: false });
+                    for (let index = 0; index < calendarTasks.length; index++) {
+                        taksDate = new Date(calendarTasks[index].date)
+                        if (taksDate.getDate() == fechaAtras.getDate() && taksDate.getMonth() == fechaAtras.getMonth()) {
+                            taresEsteDia = true
+                            console.log('si')
+                        }
+                    }
+                    if (taresEsteDia === true) {
+                        diasDelMes.push({ id: ID, number: fechaAtras.getDate(), diaSemana, fechaAtras, ThisMount: false, Today: false, requestTask: true });
+                    } else {
+                        diasDelMes.push({ id: ID, number: fechaAtras.getDate(), diaSemana, fechaAtras, ThisMount: false, Today: false, requestTask: false });
+                    }
                     ID = ID + 1
+                    taresEsteDia = false
 
                 }
             }
