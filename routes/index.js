@@ -29,6 +29,13 @@ router.get('/task/:users', async function (req, res, next) {
     res.json(data)
 })
 
+router.get('/text/:users', async function (req, res, next) {
+    const user = req.params.users
+    const data = await db.GetTextByUsers(user)
+    res.json(data)
+})
+
+
 router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
     const user = req.params.user
     const idCalendar = req.params.idCalendar

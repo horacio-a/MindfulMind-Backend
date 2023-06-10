@@ -23,6 +23,19 @@ async function GetTaskByUsers(user) {
     }
 }
 
+async function GetTextByUsers(user) {
+    try {
+        var query = 'select * from usertexts WHERE user = ?'
+        var rows = await pool.query(query, [user])
+        return rows
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+
+
 async function GetLoginByUserAndPassword(user, password) {
     try {
         var query = 'select * from users WHERE user = ? and password = ?'
@@ -55,10 +68,10 @@ async function InsertUser(obj) {
     }
 }
 
-async function getCalendarTaskByUser(user) {
+async function getCalendarTaskByUser(user, idCalendar) {
     try {
-        var query = 'SELECT * FROM calendar WHERE USER = ?';
-        var rows = await pool.query(query, [user])
+        var query = 'SELECT * FROM calendar WHERE USER = ? and idCalendar = ?';
+        var rows = await pool.query(query, [user, idCalendar])
         return rows
     } catch (error) {
         console.log(error)
@@ -79,4 +92,4 @@ async function deleteAllInfo() {
 
 
 
-module.exports = { getCalendarTaskByUser, InsertUser, InsertNewTask, GetTaskByUsers, GetLoginByUserAndPassword, checkExistence }
+module.exports = { GetTextByUsers, getCalendarTaskByUser, InsertUser, InsertNewTask, GetTaskByUsers, GetLoginByUserAndPassword, checkExistence }
