@@ -92,4 +92,7 @@ async function deleteAllInfo() {
 
 
 
-module.exports = { GetTextByUsers, getCalendarTaskByUser, InsertUser, InsertNewTask, GetTaskByUsers, GetLoginByUserAndPassword, checkExistence }
+module.exports = {
+    GetTextByUsers, getCalendarTaskByUser, InsertUser, InsertNewTask,
+    GetTaskByUsers, GetLoginByUserAndPassword, checkExistence
+}

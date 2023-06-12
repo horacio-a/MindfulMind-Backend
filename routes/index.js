@@ -26,7 +26,19 @@ router.post('/newtask/:token', async function (req, res, next) {
 router.get('/task/:users', async function (req, res, next) {
     const user = req.params.users
     const data = await db.GetTaskByUsers(user)
-    res.json(data)
+    let taskComplete = 0
+    for (let i = 0; i < data.length; i++) {
+        const element = data[i];
+        if (element.completed === 1) {
+            taskComplete = taskComplete + 1
+        }
+    }
+    let porcentaje = (taskComplete / data.length * 100).toFixed(2) + '%'
+    const obj = {
+        data,
+        porcentaje: porcentaje
+    }
+    res.json(obj)
 })
 
 router.get('/text/:users', async function (req, res, next) {
