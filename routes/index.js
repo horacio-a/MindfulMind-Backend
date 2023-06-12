@@ -3,8 +3,6 @@ var router = express.Router();
 /* GET home page. */
 var axios = require('axios');
 var db = require('../models/dbInteraction')
-const { response } = require('express');
-const { use } = require('../app');
 var md5 = require('md5');
 
 
@@ -18,10 +16,23 @@ router.post('/newtask/:token', async function (req, res, next) {
         completed: 0,
         updateDate: timeStamp
     }
-
     db.InsertNewTask(newTask)
-
 });
+
+
+router.post('/completeTask', async function (req, res, next) {
+    const data = JSON.parse(req.body.obj)
+    const response = await db.GetTaskForCheck(data.user, data.id)
+    if (response.completed === 0) {
+        const obj = {}
+        await db.updateStateTask(obj, data.user, data.id)
+        res.json({ work: true })
+    } else {
+        const obj = {}
+        await db.updateStateTask(obj, data.user, data.id)
+        res.json({ work: true })
+    }
+})
 
 router.get('/task/:users', async function (req, res, next) {
     const user = req.params.users

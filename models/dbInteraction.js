@@ -13,6 +13,27 @@ async function InsertNewTask(obj) {
     }
 }
 
+async function GetTaskForCheck(user, id) {
+    try {
+        var query = 'select * from tasks WHERE user = ? and id = ?'
+        var rows = await pool.query(query, [user, id])
+        return rows
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function updateStateTask(obj, user, id) {
+    try {
+        var query = 'UPDATE tasks set ? WHERE user = ? and id = ?'
+        var rows = await pool.query(query, [obj, user, id])
+        return rows
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
 async function GetTaskByUsers(user) {
     try {
         var query = 'select * from tasks WHERE user = ?'
@@ -94,5 +115,6 @@ async function deleteAllInfo() {
 
 module.exports = {
     GetTextByUsers, getCalendarTaskByUser, InsertUser, InsertNewTask,
-    GetTaskByUsers, GetLoginByUserAndPassword, checkExistence
+    GetTaskByUsers, GetLoginByUserAndPassword, checkExistence,
+    GetTaskForCheck, updateStateTask,
 }
