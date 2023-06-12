@@ -24,7 +24,8 @@ router.post('/completeTask', async function (req, res, next) {
     const timeStamp = new Date().getTime()
     const data = JSON.parse(req.body.obj)
     const response = await db.GetTaskForCheck(data.user, data.id)
-    console.log(response)
+    console.log(response.completed)
+    console.log(response[0].completed)
     if (response[0].completed === 0) {
 
         const obj = { id: data.id, user: data.user, tasksName: data.tasksName, completed: 1, updateDate: timeStamp }
@@ -32,6 +33,7 @@ router.post('/completeTask', async function (req, res, next) {
         console.log(alterRows)
         res.json({ work: true })
     } else {
+        console.log('0')
         const obj = { id: data.id, user: data.user, tasksName: data.tasksName, completed: 0, updateDate: timeStamp }
         const alterRows = await db.updateStateTask(obj, data.user, data.id)
         console.log(alterRows)
