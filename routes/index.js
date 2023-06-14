@@ -33,7 +33,15 @@ router.post('/completeTask', async function (req, res, next) {
         console.log(alterRows)
         const data = await db.GetTaskByUsers(dataReq.user)
 
-        res.json({ work: true, change: 0, data })
+        let taskComplete = 0
+        for (let i = 0; i < data.length; i++) {
+            const element = data[i];
+            if (element.completed === 1) {
+                taskComplete = taskComplete + 1
+            }
+        }
+        let porcentaje = (taskComplete / data.length * 100).toFixed(2) + '%'
+        res.json({ work: true, change: 0, data, porcentaje })
     } else {
         console.log('1')
         const obj = { id: dataReq.id, user: dataReq.user, tasksName: dataReq.tasksName, completed: 0, updateDate: timeStamp }
