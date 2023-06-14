@@ -4,6 +4,7 @@ var router = express.Router();
 var axios = require('axios');
 var db = require('../models/dbInteraction')
 var md5 = require('md5');
+const { token } = require('morgan');
 
 
 router.post('/newtask/:token', async function (req, res, next) {
@@ -206,12 +207,15 @@ router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
 
 
 router.post('/login', async function (req, res, next) {
+
     const user = req.body.user
     const password = req.body.password
     const data = await db.GetLoginByUserAndPassword(user, password)
     if (data !== undefined) {
+
         res.json({
             authentication: true,
+            user: user,
         })
     } else {
         res.json({
@@ -227,10 +231,11 @@ router.post('/register', async function (req, res, next) {
     console.log(check)
     if (check[0] === undefined) {
         console.log(data)
+
         let obj = {
             user: data.user,
             password: md5(data.password),
-            email: data.email
+            email: data.email,
         }
         console.log(obj)
         let response = await db.InsertUser(obj)

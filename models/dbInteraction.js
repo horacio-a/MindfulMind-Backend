@@ -68,6 +68,7 @@ async function GetLoginByUserAndPassword(user, password) {
 }
 
 
+
 async function checkExistence(user, email) {
     try {
         var query = 'SELECT * FROM users WHERE user = ? OR email = ?';
@@ -116,5 +117,5 @@ async function deleteAllInfo() {
 module.exports = {
     GetTextByUsers, getCalendarTaskByUser, InsertUser, InsertNewTask,
     GetTaskByUsers, GetLoginByUserAndPassword, checkExistence,
-    GetTaskForCheck, updateStateTask,
+    GetTaskForCheck, updateStateTask
 }
