@@ -52,8 +52,9 @@ router.get('/task/:users', async function (req, res, next) {
         }
     }
     let porcentaje = (taskComplete / data.length * 100).toFixed(2) + '%'
+    const ReloadTasks = await db.GetTaskByUsers(data.user)
     const obj = {
-        data,
+        ReloadTasks,
         porcentaje: porcentaje
     }
     res.json(obj)
