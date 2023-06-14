@@ -31,13 +31,18 @@ router.post('/completeTask', async function (req, res, next) {
         const obj = { id: data.id, user: data.user, tasksName: data.tasksName, completed: 1, updateDate: timeStamp }
         const alterRows = await db.updateStateTask(obj, data.user, data.id)
         console.log(alterRows)
-        res.json({ work: true, change: 0 })
+        const ReloadTasks = await db.GetTaskByUsers(data.user)
+
+        res.json({ work: true, change: 0, data: { ReloadTasks } })
     } else {
         console.log('1')
         const obj = { id: data.id, user: data.user, tasksName: data.tasksName, completed: 0, updateDate: timeStamp }
         const alterRows = await db.updateStateTask(obj, data.user, data.id)
         console.log(alterRows)
-        res.json({ work: true, change: 1 })
+
+        const ReloadTasks = await db.GetTaskByUsers(data.user)
+
+        res.json({ work: true, change: 1, data: { ReloadTasks } })
     }
 })
 
@@ -52,9 +57,8 @@ router.get('/task/:users', async function (req, res, next) {
         }
     }
     let porcentaje = (taskComplete / data.length * 100).toFixed(2) + '%'
-    const ReloadTasks = await db.GetTaskByUsers(data.user)
     const obj = {
-        ReloadTasks,
+        data,
         porcentaje: porcentaje
     }
     res.json(obj)
