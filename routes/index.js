@@ -23,24 +23,24 @@ router.post('/newtask/:token', async function (req, res, next) {
 
 router.post('/completeTask', async function (req, res, next) {
     const timeStamp = new Date().getTime()
-    const obj = JSON.parse(req.body.obj)
-    const response = await db.GetTaskForCheck(obj.user, obj.id)
+    const dataReq = JSON.parse(req.body.obj)
+    const response = await db.GetTaskForCheck(dataReq.user, dataReq.id)
     console.log(response[0].completed, 'complete')
     if (response[0].completed === 0) {
         console.log('0')
-        const obj = { id: obj.id, user: obj.user, tasksName: obj.tasksName, completed: 1, updateDate: timeStamp }
-        const alterRows = await db.updateStateTask(obj, obj.user, obj.id)
+        const obj = { id: dataReq.id, user: dataReq.user, tasksName: dataReq.tasksName, completed: 1, updateDate: timeStamp }
+        const alterRows = await db.updateStateTask(obj, dataReq.user, dataReq.id)
         console.log(alterRows)
-        const data = await db.GetTaskByUsers(obj.user)
+        const data = await db.GetTaskByUsers(dataReq.user)
 
         res.json({ work: true, change: 0, data })
     } else {
         console.log('1')
-        const obj = { id: obj.id, user: obj.user, tasksName: obj.tasksName, completed: 0, updateDate: timeStamp }
-        const alterRows = await db.updateStateTask(obj, obj.user, obj.id)
+        const obj = { id: dataReq.id, user: dataReq.user, tasksName: dataReq.tasksName, completed: 0, updateDate: timeStamp }
+        const alterRows = await db.updateStateTask(obj, dataReq.user, dataReq.id)
         console.log(alterRows)
 
-        const data = await db.GetTaskByUsers(obj.user)
+        const data = await db.GetTaskByUsers(dataReq.user)
 
         res.json({ work: true, change: 1, data })
     }
