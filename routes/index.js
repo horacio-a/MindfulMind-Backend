@@ -56,7 +56,7 @@ router.post('/completeTask', async function (req, res, next) {
                 taskComplete = taskComplete + 1
             }
         }
-        let porcentaje = (taskComplete / data.length * 100).toFixed(2) + '%'
+        let porcentaje = (taskComplete / data.length * 100).toFixed(0) + '%'
         res.json({ work: true, change: 1, data, porcentaje })
     }
 })
