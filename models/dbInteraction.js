@@ -102,14 +102,7 @@ async function getCalendarTaskByUser(user, idCalendar) {
 
 
 
-async function deleteAllInfo() {
-    try {
-        var query = 'delete from info'
-        var rows = await pool.query(query)
-    } catch (error) {
-        console.log(error)
-    }
-}
+
 
 
 

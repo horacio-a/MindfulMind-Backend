@@ -51,7 +51,7 @@ router.get('/task/:users', async function (req, res, next) {
             taskComplete = taskComplete + 1
         }
     }
-    let porcentaje = (taskComplete / data.length * 100).toFixed(2) + '%'
+    let porcentaje = (taskComplete / data.length * 100).toFixed(0) + '%'
     const obj = {
         data,
         porcentaje: porcentaje
@@ -257,7 +257,7 @@ router.post('/register', async function (req, res, next) {
 
 router.post('/mainDataInitial', async function (req, res, next) {
     const RequestData = req.body.obj
-    console.log(RequestData)
+    // console.log(RequestData)
     async function Tasks() {
         const user = RequestData.Tasks.user
         const data = await db.GetTaskByUsers(user)
@@ -279,7 +279,6 @@ router.post('/mainDataInitial', async function (req, res, next) {
         const user = RequestData.Calendar.user
         const idCalendar = RequestData.Calendar.idCalendar
         const calendarTasks = await db.getCalendarTaskByUser(user, idCalendar)
-
         function obtenerDiasDelMes() {
             let ID = 1
             const fechaActual = new Date(); // Obtener la fecha actual
@@ -368,7 +367,6 @@ router.post('/mainDataInitial', async function (req, res, next) {
                             taksDate = new Date(calendarTasks[index].date)
                             if (taksDate.getDate() == fechaAtras.getDate() && taksDate.getMonth() == fechaAtras.getMonth()) {
                                 taresEsteDia = true
-                                console.log('si')
                             }
                         }
                         if (taresEsteDia === true) {
