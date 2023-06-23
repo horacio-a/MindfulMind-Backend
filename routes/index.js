@@ -441,4 +441,9 @@ router.post('/mainDataInitial', async function (req, res, next) {
 
 
 
+router.get('/test', async function(req, res, next){
+    
+})
+
+
 module.exports = router;
