@@ -313,6 +313,7 @@ router.post('/mainDataInitial', async function (req, res, next) {
             // Recorrer desde el primer día hasta el último día del mes
             for (let i = primerDia.getDate(); i <= ultimoDia.getDate(); i++) {
                 let taresEsteDia = false
+                let DaysTask = []
                 const fecha = new Date(año, mes, i); // Crear una fecha con el día actual
                 const diaSemana = fecha.toLocaleDateString('es-ES', { weekday: 'long' }); // Obtener el día de la semana como una cadena de texto
                 for (let index = 0; index < calendarTasks.length; index++) {
@@ -320,17 +321,18 @@ router.post('/mainDataInitial', async function (req, res, next) {
                     taksDate = new Date(element.date)
                     if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
                         taresEsteDia = true
+                        DaysTask.push(element)
                     }
                 }
                 if (fecha.getDate() == fechaActual.getDate()) {
                     if (taresEsteDia === true) {
-                        diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: true, requestTask: true });
+                        diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: true, requestTask: true, Tasks: DaysTask });
                     } else {
                         diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: true, requestTask: false });
                     }
                 } else {
                     if (taresEsteDia === true) {
-                        diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: false, requestTask: true });
+                        diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: false, requestTask: true, Tasks: DaysTask });
                     } else {
                         diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: false, requestTask: false });
                     }
@@ -441,8 +443,8 @@ router.post('/mainDataInitial', async function (req, res, next) {
 
 
 
-router.get('/test', async function(req, res, next){
-    
+router.get('/test', async function (req, res, next) {
+
 })
 
 
