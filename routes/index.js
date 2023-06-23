@@ -322,20 +322,17 @@ router.post('/mainDataInitial', async function (req, res, next) {
                     if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
                         taresEsteDia = true
                         DaysTask.push(element)
-                        console.log('push' + element)
                     }
                 }
                 if (fecha.getDate() == fechaActual.getDate()) {
                     if (taresEsteDia === true) {
                         diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: true, requestTask: true, Tasks: DaysTask });
-                        console.log(DaysTask)
                     } else {
                         diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: true, requestTask: false });
                     }
                 } else {
                     if (taresEsteDia === true) {
                         diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: false, requestTask: true, Tasks: DaysTask });
-                        console.log(DaysTask)
                     } else {
                         diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: false, requestTask: false });
                     }
@@ -359,6 +356,7 @@ router.post('/mainDataInitial', async function (req, res, next) {
                 if (cantidadDias != 0) {
                     for (let i = 1; i < cantidadDias + 1; i++) {
                         let taresEsteDia = false
+                        let DaysTask = []
                         const fechaAtras = new Date(fecha); // Crear una nueva instancia de Date con la fecha dada
                         fechaAtras.setDate(fechaAtras.getDate() - i); // Restar "i" días a la fecha dada
                         const diaSemana = fechaAtras.toLocaleDateString('es-ES', { weekday: 'long' });
@@ -366,10 +364,12 @@ router.post('/mainDataInitial', async function (req, res, next) {
                             taksDate = new Date(calendarTasks[index].date)
                             if (taksDate.getDate() == fechaAtras.getDate() && taksDate.getMonth() == fechaAtras.getMonth()) {
                                 taresEsteDia = true
+                                DaysTask.push(element)
+
                             }
                         }
                         if (taresEsteDia === true) {
-                            diasDelMes.unshift({ id: ID, number: fechaAtras.getDate(), diaSemana, fechaAtras, ThisMount: false, Today: false, requestTask: true });
+                            diasDelMes.unshift({ id: ID, number: fechaAtras.getDate(), diaSemana, fechaAtras, ThisMount: false, Today: false, requestTask: true, Tasks: DaysTask });
                         } else {
                             diasDelMes.unshift({ id: ID, number: fechaAtras.getDate(), diaSemana, fechaAtras, ThisMount: false, Today: false, requestTask: false });
                         }
@@ -385,6 +385,7 @@ router.post('/mainDataInitial', async function (req, res, next) {
                 if (cantidadDias != 0) {
                     for (let i = 1; i < cantidadDias + 1; i++) {
                         let taresEsteDia = false
+                        let DaysTask = []
                         const fechaAtras = new Date(fecha); // Crear una nueva instancia de Date con la fecha dada
                         fechaAtras.setDate(fechaAtras.getDate() + i); // Restar "i" días a la fecha dada
                         const diaSemana = fechaAtras.toLocaleDateString('es-ES', { weekday: 'long' });
@@ -392,10 +393,11 @@ router.post('/mainDataInitial', async function (req, res, next) {
                             taksDate = new Date(calendarTasks[index].date)
                             if (taksDate.getDate() == fechaAtras.getDate() && taksDate.getMonth() == fechaAtras.getMonth()) {
                                 taresEsteDia = true
+                                DaysTask.push(element)
                             }
                         }
                         if (taresEsteDia === true) {
-                            diasDelMes.push({ id: ID, number: fechaAtras.getDate(), diaSemana, fechaAtras, ThisMount: false, Today: false, requestTask: true });
+                            diasDelMes.push({ id: ID, number: fechaAtras.getDate(), diaSemana, fechaAtras, ThisMount: false, Today: false, requestTask: true, Tasks: DaysTask });
                         } else {
                             diasDelMes.push({ id: ID, number: fechaAtras.getDate(), diaSemana, fechaAtras, ThisMount: false, Today: false, requestTask: false });
                         }
