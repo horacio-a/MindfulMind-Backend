@@ -322,17 +322,20 @@ router.post('/mainDataInitial', async function (req, res, next) {
                     if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
                         taresEsteDia = true
                         DaysTask.push(element)
+                        console.log('push' + element)
                     }
                 }
                 if (fecha.getDate() == fechaActual.getDate()) {
                     if (taresEsteDia === true) {
                         diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: true, requestTask: true, Tasks: DaysTask });
+                        console.log(DaysTask)
                     } else {
                         diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: true, requestTask: false });
                     }
                 } else {
                     if (taresEsteDia === true) {
                         diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: false, requestTask: true, Tasks: DaysTask });
+                        console.log(DaysTask)
                     } else {
                         diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: false, requestTask: false });
                     }
