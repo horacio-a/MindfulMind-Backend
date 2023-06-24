@@ -361,6 +361,7 @@ router.post('/mainDataInitial', async function (req, res, next) {
                         fechaAtras.setDate(fechaAtras.getDate() - i); // Restar "i" días a la fecha dada
                         const diaSemana = fechaAtras.toLocaleDateString('es-ES', { weekday: 'long' });
                         for (let index = 0; index < calendarTasks.length; index++) {
+                            const element = calendarTasks[index];
                             taksDate = new Date(calendarTasks[index].date)
                             if (taksDate.getDate() == fechaAtras.getDate() && taksDate.getMonth() == fechaAtras.getMonth()) {
                                 taresEsteDia = true
@@ -390,10 +391,11 @@ router.post('/mainDataInitial', async function (req, res, next) {
                         fechaAtras.setDate(fechaAtras.getDate() + i); // Restar "i" días a la fecha dada
                         const diaSemana = fechaAtras.toLocaleDateString('es-ES', { weekday: 'long' });
                         for (let index = 0; index < calendarTasks.length; index++) {
+                            const element = calendarTasks[index];
                             taksDate = new Date(calendarTasks[index].date)
                             if (taksDate.getDate() == fechaAtras.getDate() && taksDate.getMonth() == fechaAtras.getMonth()) {
                                 taresEsteDia = true
-                                DaysTask.push(element)
+                                DaysTask.push(taksDate)
                             }
                         }
                         if (taresEsteDia === true) {
