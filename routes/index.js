@@ -395,7 +395,7 @@ router.post('/mainDataInitial', async function (req, res, next) {
                             taksDate = new Date(calendarTasks[index].date)
                             if (taksDate.getDate() == fechaAtras.getDate() && taksDate.getMonth() == fechaAtras.getMonth()) {
                                 taresEsteDia = true
-                                DaysTask.push(taksDate)
+                                DaysTask.push(element)
                             }
                         }
                         if (taresEsteDia === true) {
