@@ -10,7 +10,6 @@ const { token } = require('morgan');
 router.post('/newtask/:token', async function (req, res, next) {
     const timeStamp = new Date().getTime()
     const Data = req.body
-    console.log(Data)
     const newTask = {
         user: 'horacio',
         tasksName: 'Ir al gimnasio',
@@ -25,12 +24,9 @@ router.post('/completeTask', async function (req, res, next) {
     const timeStamp = new Date().getTime()
     const dataReq = JSON.parse(req.body.obj)
     const response = await db.GetTaskForCheck(dataReq.user, dataReq.id)
-    console.log(response[0].completed, 'complete')
     if (response[0].completed === 0) {
-        console.log('0')
         const obj = { id: dataReq.id, user: dataReq.user, tasksName: dataReq.tasksName, completed: 1, updateDate: timeStamp }
         const alterRows = await db.updateStateTask(obj, dataReq.user, dataReq.id)
-        console.log(alterRows)
         const data = await db.GetTaskByUsers(dataReq.user)
 
         let taskComplete = 0
@@ -43,10 +39,8 @@ router.post('/completeTask', async function (req, res, next) {
         let porcentaje = (taskComplete / data.length * 100).toFixed(0) + '%'
         res.json({ work: true, change: 0, data, porcentaje })
     } else {
-        console.log('1')
         const obj = { id: dataReq.id, user: dataReq.user, tasksName: dataReq.tasksName, completed: 0, updateDate: timeStamp }
         const alterRows = await db.updateStateTask(obj, dataReq.user, dataReq.id)
-        console.log(alterRows)
 
         const data = await db.GetTaskByUsers(dataReq.user)
         let taskComplete = 0
@@ -90,7 +84,6 @@ router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
     const user = req.params.user
     const idCalendar = req.params.idCalendar
     const calendarTasks = await db.getCalendarTaskByUser(user, idCalendar)
-    console.log(calendarTasks)
 
     function obtenerDiasDelMes() {
         let ID = 1
@@ -180,7 +173,6 @@ router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
                         taksDate = new Date(calendarTasks[index].date)
                         if (taksDate.getDate() == fechaAtras.getDate() && taksDate.getMonth() == fechaAtras.getMonth()) {
                             taresEsteDia = true
-                            console.log('si')
                         }
                     }
                     if (taresEsteDia === true) {
@@ -248,19 +240,15 @@ router.post('/login', async function (req, res, next) {
 router.post('/register', async function (req, res, next) {
     const data = JSON.parse(req.body.obj)
     const check = await db.checkExistence(data.user, data.email)
-    console.log(check)
     if (check[0] === undefined) {
-        console.log(data)
 
         let obj = {
             user: data.user,
             password: md5(data.password),
             email: data.email,
         }
-        console.log(obj)
         let response = await db.InsertUser(obj)
         res.json({ response, userCreate: true })
-        console.log(response)
     } else {
         let ErrorResponse = { error: { email: false, user: false }, userCreate: false }
         if (check[0].user == data.user) {
@@ -277,7 +265,6 @@ router.post('/register', async function (req, res, next) {
 
 router.post('/mainDataInitial', async function (req, res, next) {
     const RequestData = req.body.obj
-    // console.log(RequestData)
     async function Tasks() {
         const user = RequestData.Tasks.user
         const data = await db.GetTaskByUsers(user)
