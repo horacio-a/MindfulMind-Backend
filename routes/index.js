@@ -308,7 +308,7 @@ router.post('/mainDataInitial', async function (req, res, next) {
                     taksDate = new Date(element.date)
                     if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
                         taresEsteDia = true
-                        DaysTask.push(element)
+                        DaysTask.push([element])
                     }
                 }
                 if (fecha.getDate() == fechaActual.getDate()) {
@@ -352,7 +352,7 @@ router.post('/mainDataInitial', async function (req, res, next) {
                             taksDate = new Date(calendarTasks[index].date)
                             if (taksDate.getDate() == fechaAtras.getDate() && taksDate.getMonth() == fechaAtras.getMonth()) {
                                 taresEsteDia = true
-                                DaysTask.push(element)
+                                DaysTask.push([element])
 
                             }
                         }
@@ -382,7 +382,7 @@ router.post('/mainDataInitial', async function (req, res, next) {
                             taksDate = new Date(calendarTasks[index].date)
                             if (taksDate.getDate() == fechaAtras.getDate() && taksDate.getMonth() == fechaAtras.getMonth()) {
                                 taresEsteDia = true
-                                DaysTask.push(element)
+                                DaysTask.push([element])
                             }
                         }
                         if (taresEsteDia === true) {
