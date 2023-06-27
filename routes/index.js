@@ -286,6 +286,7 @@ router.post('/mainDataInitial', async function (req, res, next) {
         const user = RequestData.Calendar.user
         const idCalendar = RequestData.Calendar.idCalendar
         const calendarTasks = await db.getCalendarTaskByUser(user, idCalendar)
+        // console.log(calendarTasks)
         function obtenerDiasDelMes() {
             let ID = 1
             const fechaActual = new Date(); // Obtener la fecha actual
@@ -299,16 +300,17 @@ router.post('/mainDataInitial', async function (req, res, next) {
 
             // Recorrer desde el primer día hasta el último día del mes
             for (let i = primerDia.getDate(); i <= ultimoDia.getDate(); i++) {
+                const DaysTask = []
                 let taresEsteDia = false
-                let DaysTask = []
                 const fecha = new Date(año, mes, i); // Crear una fecha con el día actual
                 const diaSemana = fecha.toLocaleDateString('es-ES', { weekday: 'long' }); // Obtener el día de la semana como una cadena de texto
                 for (let index = 0; index < calendarTasks.length; index++) {
                     const element = calendarTasks[index];
+
                     taksDate = new Date(element.date)
                     if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
                         taresEsteDia = true
-                        DaysTask.push([element])
+                        DaysTask.push(element)
                     }
                 }
                 if (fecha.getDate() == fechaActual.getDate()) {
@@ -352,7 +354,7 @@ router.post('/mainDataInitial', async function (req, res, next) {
                             taksDate = new Date(calendarTasks[index].date)
                             if (taksDate.getDate() == fechaAtras.getDate() && taksDate.getMonth() == fechaAtras.getMonth()) {
                                 taresEsteDia = true
-                                DaysTask.push([element])
+                                DaysTask.push(element)
 
                             }
                         }
@@ -382,7 +384,7 @@ router.post('/mainDataInitial', async function (req, res, next) {
                             taksDate = new Date(calendarTasks[index].date)
                             if (taksDate.getDate() == fechaAtras.getDate() && taksDate.getMonth() == fechaAtras.getMonth()) {
                                 taresEsteDia = true
-                                DaysTask.push([element])
+                                DaysTask.push(element)
                             }
                         }
                         if (taresEsteDia === true) {
