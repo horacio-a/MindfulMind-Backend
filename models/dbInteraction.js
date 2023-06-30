@@ -102,6 +102,16 @@ async function getCalendarTaskByUser(user, idCalendar) {
 
 
 
+async function FinishFuntion() {
+    try {
+        var query = 'UPDATE tasks SET completed = 0'
+        var rows = pool.query(query)
+        return rows
+    } catch (error) {
+        console.log(error)
+
+    }
+}
 
 
 
@@ -110,5 +120,5 @@ async function getCalendarTaskByUser(user, idCalendar) {
 module.exports = {
     GetTextByUsers, getCalendarTaskByUser, InsertUser, InsertNewTask,
     GetTaskByUsers, GetLoginByUserAndPassword, checkExistence,
-    GetTaskForCheck, updateStateTask
+    GetTaskForCheck, updateStateTask, FinishFuntion
 }
