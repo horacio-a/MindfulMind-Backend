@@ -7,8 +7,8 @@ var md5 = require('md5');
 const { token } = require('morgan');
 var cron = require('node-cron');
 
-cron.schedule('0 0 * * *', () => {
-    db.FinishFuntion()
+cron.schedule('* * * * * *', () => {
+    console.log('hola')
 }, {
     scheduled: true,
     timezone: 'America/Argentina/Buenos_Aires'
