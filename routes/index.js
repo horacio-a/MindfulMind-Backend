@@ -5,7 +5,7 @@ var db = require('../models/dbInteraction')
 var md5 = require('md5');
 var cron = require('node-cron');
 
-cron.schedule('39 9 * * *', () => {
+cron.schedule('0 0 * * *', () => {
     db.FinishFuntion()
     console.log('si?')
 }, {
