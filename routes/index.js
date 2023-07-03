@@ -1,14 +1,13 @@
 var express = require('express');
 var router = express.Router();
-/* GET home page. */
 var axios = require('axios');
 var db = require('../models/dbInteraction')
 var md5 = require('md5');
-const { token } = require('morgan');
 var cron = require('node-cron');
 
-cron.schedule('39 19 * * *', () => {
+cron.schedule('39 9 * * *', () => {
     db.FinishFuntion()
+    console.log('si?')
 }, {
     scheduled: true,
     timezone: 'America/Argentina/Buenos_Aires'
