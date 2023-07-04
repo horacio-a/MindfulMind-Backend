@@ -47,7 +47,17 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+var axios = require('axios');
+var cron = require('node-cron');
 
+cron.schedule('6 10 * * *', () => {
+
+  axios.get('http://localhost:3500/FinishFuntion')
+  console.log('hola')
+}, {
+  scheduled: true,
+  timezone: 'America/Argentina/Buenos_Aires'
+});
 
 
 

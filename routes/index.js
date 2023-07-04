@@ -1,17 +1,9 @@
 var express = require('express');
 var router = express.Router();
-var axios = require('axios');
 var db = require('../models/dbInteraction')
 var md5 = require('md5');
-var cron = require('node-cron');
 
-cron.schedule('0 0 * * *', () => {
-    db.FinishFuntion()
-    console.log('si?')
-}, {
-    scheduled: true,
-    timezone: 'America/Argentina/Buenos_Aires'
-});
+
 
 router.post('/newtask/:token', async function (req, res, next) {
     const timeStamp = new Date().getTime()
@@ -446,6 +438,14 @@ router.post('/mainDataInitial', async function (req, res, next) {
 
 
 router.get('/test', async function (req, res, next) {
+
+})
+
+router.get('/FinishFuntion', async function (req, res, next) {
+    db.FinishFuntion()
+    console.log('si?')
+    res.json({ request: true })
+
 })
 
 
