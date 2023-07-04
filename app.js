@@ -50,7 +50,7 @@ app.use(function (err, req, res, next) {
 var axios = require('axios');
 var cron = require('node-cron');
 
-cron.schedule('6 10 * * *', () => {
+cron.schedule('0 0 * * *', () => {
 
   axios.get('http://localhost:3500/FinishFuntion')
   console.log('hola')
