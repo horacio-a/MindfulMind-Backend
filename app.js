@@ -51,12 +51,24 @@ var axios = require('axios');
 var cron = require('node-cron');
 
 cron.schedule('0 0 * * *', () => {
-
   axios.get('http://localhost:3500/FinishFuntion')
   console.log('hola')
 }, {
   scheduled: true,
-  timezone: 'America/Argentina/Buenos_Aires'
+  timezone: 'America/Argentina/Buenos_Aires',
+  name: 'Change-tasks',
+  recoverMissedExecutions: false,
+
+});
+
+cron.schedule('* * * * *', () => {
+  const date = new Date();
+  console.log(`This task is running every minute - ${date.getHours()}:${date.getMinutes()}`)
+}, {
+  scheduled: true,
+  timezone: 'America/Argentina/Buenos_Aires',
+  name: 'simple-task',
+  recoverMissedExecutions: false,
 });
 
 
