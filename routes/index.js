@@ -80,139 +80,151 @@ router.get('/text/:users', async function (req, res, next) {
 
 
 router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
-    const user = req.params.user
-    const idCalendar = req.params.idCalendar
-    const calendarTasks = await db.getCalendarTaskByUser(user, idCalendar)
+    async function Calendar() {
+        const user = req.params.user
+        const idCalendar = req.params.idCalendar
+        const calendarTasks = await db.getCalendarTaskByUser(user, idCalendar)
+        // console.log(calendarTasks)
+        function obtenerDiasDelMes() {
+            let ID = 1
+            const fechaActual = new Date(); // Obtener la fecha actual
+            const año = fechaActual.getFullYear(); // Obtener el año actual
+            const mes = fechaActual.getMonth(); // Obtener el mes actual (0-11)
 
-    function obtenerDiasDelMes() {
-        let ID = 1
+            const primerDia = new Date(año, mes, 1); // Crear una fecha con el primer día del mes
+            const ultimoDia = new Date(año, mes + 1, 0); // Crear una fecha con el último día del mes
+
+            const diasDelMes = [];
+
+            // Recorrer desde el primer día hasta el último día del mes
+            for (let i = primerDia.getDate(); i <= ultimoDia.getDate(); i++) {
+                const DaysTask = []
+                let taresEsteDia = false
+                const fecha = new Date(año, mes, i); // Crear una fecha con el día actual
+                const diaSemana = fecha.toLocaleDateString('es-ES', { weekday: 'long' }); // Obtener el día de la semana como una cadena de texto
+                for (let index = 0; index < calendarTasks.length; index++) {
+                    const element = calendarTasks[index];
+
+                    taksDate = new Date(element.date)
+                    if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
+                        taresEsteDia = true
+                        DaysTask.push(element)
+                    }
+                }
+                if (fecha.getDate() == fechaActual.getDate()) {
+                    if (taresEsteDia === true) {
+                        diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: true, requestTask: true, Tasks: DaysTask });
+                    } else {
+                        diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: true, requestTask: false });
+                    }
+                } else {
+                    if (taresEsteDia === true) {
+                        diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: false, requestTask: true, Tasks: DaysTask });
+                    } else {
+                        diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: false, requestTask: false });
+                    }
+                }
+                taresEsteDia = false
+                ID = ID + 1
+            }
+
+            const diasDeLaSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado']
+            let numAnterior = 0
+
+
+            for (let i = 0; i < diasDeLaSemana.length; i++) {
+                const element = diasDeLaSemana[i];
+                if (diasDelMes[0].diaSemana === element) {
+                    numAnterior = i
+                }
+            }
+
+            function obtenerDiasAtras(NewFecha, cantidadDias) {
+                if (cantidadDias != 0) {
+                    for (let i = 1; i < cantidadDias + 1; i++) {
+                        let taresEsteDia = false
+                        let DaysTask = []
+                        const fecha = new Date(NewFecha); // Crear una nueva instancia de Date con la fecha dada
+                        fecha.setDate(fecha.getDate() - i); // Restar "i" días a la fecha dada
+                        const diaSemana = fecha.toLocaleDateString('es-ES', { weekday: 'long' });
+                        for (let index = 0; index < calendarTasks.length; index++) {
+                            const element = calendarTasks[index];
+                            taksDate = new Date(calendarTasks[index].date)
+                            if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
+                                taresEsteDia = true
+                                DaysTask.push(element)
+
+                            }
+                        }
+                        if (taresEsteDia === true) {
+                            diasDelMes.unshift({ id: ID, number: fecha.getDate(), diaSemana, fecha, ThisMount: false, Today: false, requestTask: true, Tasks: DaysTask });
+                        } else {
+                            diasDelMes.unshift({ id: ID, number: fecha.getDate(), diaSemana, fecha, ThisMount: false, Today: false, requestTask: false });
+                        }
+                        ID = ID + 1
+                        taresEsteDia = false
+
+                    }
+                }
+            }
+            obtenerDiasAtras(diasDelMes[0].fecha, numAnterior)
+
+            function obtenerDiasDelante(NewFecha, cantidadDias) {
+                if (cantidadDias != 0) {
+                    for (let i = 1; i < cantidadDias + 1; i++) {
+                        let taresEsteDia = false
+                        let DaysTask = []
+                        const fecha = new Date(NewFecha); // Crear una nueva instancia de Date con la fecha dada
+                        fecha.setDate(fecha.getDate() + i); // Restar "i" días a la fecha dada
+                        const diaSemana = fecha.toLocaleDateString('es-ES', { weekday: 'long' });
+                        for (let index = 0; index < calendarTasks.length; index++) {
+                            const element = calendarTasks[index];
+                            taksDate = new Date(calendarTasks[index].date)
+                            if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
+                                taresEsteDia = true
+                                DaysTask.push(element)
+                            }
+                        }
+                        if (taresEsteDia === true) {
+                            diasDelMes.push({ id: ID, number: fecha.getDate(), diaSemana, fecha, ThisMount: false, Today: false, requestTask: true, Tasks: DaysTask });
+                        } else {
+                            diasDelMes.push({ id: ID, number: fecha.getDate(), diaSemana, fecha, ThisMount: false, Today: false, requestTask: false });
+                        }
+                        ID = ID + 1
+                        taresEsteDia = false
+
+                    }
+                }
+            }
+            const numPosterior = 42 - diasDelMes.length //  se obtiene el numero de dias que se necesita para rellenar el calendario
+
+            obtenerDiasDelante(diasDelMes[diasDelMes.length - 1].fecha, numPosterior)
+
+
+
+            return diasDelMes;
+        }
         const fechaActual = new Date(); // Obtener la fecha actual
         const año = fechaActual.getFullYear(); // Obtener el año actual
-        const mes = fechaActual.getMonth(); // Obtener el mes actual (0-11)
 
-        const primerDia = new Date(año, mes, 1); // Crear una fecha con el primer día del mes
-        const ultimoDia = new Date(año, mes + 1, 0); // Crear una fecha con el último día del mes
+        function obtenerNombreMes(fecha) {
+            const opciones = { month: 'long' };
+            const nombreMes = fecha.toLocaleString('es-ES', opciones);
 
-        const diasDelMes = [];
-
-        // Recorrer desde el primer día hasta el último día del mes
-        for (let i = primerDia.getDate(); i <= ultimoDia.getDate(); i++) {
-            let taresEsteDia = false
-            const fecha = new Date(año, mes, i); // Crear una fecha con el día actual
-            const diaSemana = fecha.toLocaleDateString('es-ES', { weekday: 'long' }); // Obtener el día de la semana como una cadena de texto
-            for (let index = 0; index < calendarTasks.length; index++) {
-                const element = calendarTasks[index];
-                taksDate = new Date(element.date)
-                if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
-                    taresEsteDia = true
-                }
-            }
-            if (fecha.getDate() == fechaActual.getDate()) {
-                if (taresEsteDia === true) {
-                    diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: true, requestTask: true });
-                } else {
-                    diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: true, requestTask: false });
-                }
-            } else {
-                if (taresEsteDia === true) {
-                    diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: false, requestTask: true });
-                } else {
-                    diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: false, requestTask: false });
-                }
-            }
-            taresEsteDia = false
-            ID = ID + 1
+            return nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1);
         }
 
-        const diasDeLaSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado']
-        let numAnterior = 0
-
-
-        for (let i = 0; i < diasDeLaSemana.length; i++) {
-            const element = diasDeLaSemana[i];
-            if (diasDelMes[0].diaSemana === element) {
-                numAnterior = i
-            }
-        }
-
-        function obtenerDiasAtras(fecha, cantidadDias) {
-            if (cantidadDias != 0) {
-                for (let i = 1; i < cantidadDias + 1; i++) {
-                    let taresEsteDia = false
-                    const fecha = new Date(fecha); // Crear una nueva instancia de Date con la fecha dada
-                    fecha.setDate(fecha.getDate() - i); // Restar "i" días a la fecha dada
-                    const diaSemana = fecha.toLocaleDateString('es-ES', { weekday: 'long' });
-                    for (let index = 0; index < calendarTasks.length; index++) {
-                        taksDate = new Date(calendarTasks[index].date)
-                        if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
-                            taresEsteDia = true
-                        }
-                    }
-                    if (taresEsteDia === true) {
-                        diasDelMes.unshift({ id: ID, number: fecha.getDate(), diaSemana, fecha, ThisMount: false, Today: false, requestTask: true });
-                    } else {
-                        diasDelMes.unshift({ id: ID, number: fecha.getDate(), diaSemana, fecha, ThisMount: false, Today: false, requestTask: false });
-                    }
-                    ID = ID + 1
-                    taresEsteDia = false
-
-                }
-            }
-        }
-        obtenerDiasAtras(diasDelMes[0].fecha, numAnterior)
-
-        function obtenerDiasDelante(fecha, cantidadDias) {
-            if (cantidadDias != 0) {
-                for (let i = 1; i < cantidadDias + 1; i++) {
-                    let taresEsteDia = false
-                    const fecha = new Date(fecha); // Crear una nueva instancia de Date con la fecha dada
-                    fecha.setDate(fecha.getDate() + i); // Restar "i" días a la fecha dada
-                    const diaSemana = fecha.toLocaleDateString('es-ES', { weekday: 'long' });
-                    for (let index = 0; index < calendarTasks.length; index++) {
-                        taksDate = new Date(calendarTasks[index].date)
-                        if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
-                            taresEsteDia = true
-                        }
-                    }
-                    if (taresEsteDia === true) {
-                        diasDelMes.push({ id: ID, number: fecha.getDate(), diaSemana, fecha, ThisMount: false, Today: false, requestTask: true });
-                    } else {
-                        diasDelMes.push({ id: ID, number: fecha.getDate(), diaSemana, fecha, ThisMount: false, Today: false, requestTask: false });
-                    }
-                    ID = ID + 1
-                    taresEsteDia = false
-
-                }
-            }
-        }
-        const numPosterior = 42 - diasDelMes.length //  se obtiene el numero de dias que se necesita para rellenar el calendario
-
-        obtenerDiasDelante(diasDelMes[diasDelMes.length - 1].fecha, numPosterior)
+        const mes = obtenerNombreMes(fechaActual);
 
 
 
-        return diasDelMes;
-    }
-    const fechaActual = new Date(); // Obtener la fecha actual
-    const año = fechaActual.getFullYear(); // Obtener el año actual
-
-    function obtenerNombreMes(fecha) {
-        const opciones = { month: 'long' };
-        const nombreMes = fecha.toLocaleString('es-ES', opciones);
-
-        return nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1);
+        return ({
+            data: { month: mes, year: año },
+            days: obtenerDiasDelMes(),
+        })
     }
 
-    const mes = obtenerNombreMes(fechaActual);
-
-    const calendar = {
-        data: { month: mes, year: año },
-        days: obtenerDiasDelMes(),
-    }
-
-
-
-    res.json(calendar)
+    res.json(await Calendar())
 })
 
 
