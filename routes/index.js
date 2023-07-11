@@ -438,15 +438,16 @@ router.post('/mainDataInitial', async function (req, res, next) {
 
 
 
-router.get('/test', async function (req, res, next) {
-
+router.post('/AddCalendarTask', async function (req, res, next) {
+    const obj = req.body.obj
+    db.InsertCalendarTask(obj)
+    res.json({ request: true })
 })
 
 router.get('/FinishFuntion', async function (req, res, next) {
     db.FinishFuntion()
     console.log('si?')
     res.json({ request: true })
-
 })
 
 
