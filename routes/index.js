@@ -445,7 +445,7 @@ router.post('/AddCalendarTask', async function (req, res, next) {
     } else {
 
         obj.data.intialHour = obj.data.intialHour.split('T')[0] + 'T00:00:00.000Z'
-        obj.data.finishHour = obj.data.finishHour.split('T')[0] + 'T23:59:99.999Z'
+        obj.data.finishHour = obj.data.finishHour.split('T')[0] + 'T23:59:59.999Z'
 
         db.InsertCalendarTask(obj.data)
     }
