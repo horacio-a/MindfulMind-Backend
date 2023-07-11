@@ -92,7 +92,7 @@ async function InsertUser(obj) {
 
 async function getCalendarTaskByUser(user, idCalendar) {
     try {
-        var query = 'SELECT * FROM calendar WHERE USER = ? and idCalendar = ?';
+        var query = 'SELECT * FROM calendar WHERE USER = ? and idCalendar = ? ORDER BY `calendar`.`intialHour` ASC';
         var rows = await pool.query(query, [user, idCalendar])
         return rows
     } catch (error) {
