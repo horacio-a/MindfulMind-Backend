@@ -439,8 +439,16 @@ router.post('/mainDataInitial', async function (req, res, next) {
 
 
 router.post('/AddCalendarTask', async function (req, res, next) {
-    const obj = req.body.obj
-    db.InsertCalendarTask(obj)
+    const obj = req.body
+    if (obj.info.Allday) {
+        db.InsertCalendarTask(obj.data)
+    } else {
+
+        obj.data.intialHour = obj.data.intialHour.split('T')[0] + 'T00:00:00.000Z'
+        obj.data.finishHour = obj.data.finishHour.split('T')[0] + 'T23:59:99.999Z'
+
+        db.InsertCalendarTask(obj.data)
+    }
     res.json({ request: true })
 })
 
