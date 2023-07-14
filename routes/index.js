@@ -11,6 +11,7 @@ router.post('/newtask/:token', async function (req, res, next) {
     const Data = req.body
     console.log(Data.user)
     const OrderNumber = await db.GetLastNumberOrder(Data.user)
+    console.log(OrderNumber)
     const newTask = {
         user: Data.user,
         tasksName: Data.title,
