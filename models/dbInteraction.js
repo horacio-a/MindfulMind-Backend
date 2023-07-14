@@ -7,6 +7,7 @@ async function InsertNewTask(obj) {
     try {
         var query = 'insert into tasks set ?';
         var rows = await pool.query(query, [obj])
+        console.log(rows)
         return rows
     } catch (error) {
         console.log(error)
