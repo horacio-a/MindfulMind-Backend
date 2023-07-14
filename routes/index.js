@@ -9,13 +9,17 @@ var md5 = require('md5');
 router.post('/newtask/:token', async function (req, res, next) {
     const timeStamp = new Date().getTime()
     const Data = req.body
+    console.log(Data.user)
+    const OrderNumber = await db.GetLastNumberOrder(Data.user)
     const newTask = {
-        user: 'horacio',
-        tasksName: 'Ir al gimnasio',
+        user: Data.user,
+        tasksName: Data.title,
         completed: 0,
-        updateDate: timeStamp
+        updateDate: timeStamp,
+        Orden: parseInt(OrderNumber)
     }
-    db.InsertNewTask(newTask)
+    const Response = await db.InsertNewTask(newTask)
+    res.json(Response)
 });
 
 

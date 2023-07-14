@@ -125,11 +125,24 @@ async function InsertCalendarTask(obj) {
 }
 
 
+async function GetLastNumberOrder(user) {
+    try {
+        var query = 'SELECT Orden from tasks WHERE user = ? order BY Orden DESC LIMIT 1;';
+        var rows = await pool.query(query, [user])
+        return rows[0].Orden + 1
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+
 
 
 
 module.exports = {
     GetTextByUsers, getCalendarTaskByUser, InsertUser, InsertNewTask,
     GetTaskByUsers, GetLoginByUserAndPassword, checkExistence,
-    GetTaskForCheck, updateStateTask, FinishFuntion, InsertCalendarTask
+    GetTaskForCheck, updateStateTask, FinishFuntion, InsertCalendarTask,
+    GetLastNumberOrder
 }
