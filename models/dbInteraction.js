@@ -129,7 +129,7 @@ async function GetLastNumberOrder(user) {
     try {
         var query = 'SELECT Orden from tasks WHERE user = ? order BY Orden DESC LIMIT 1;';
         var rows = await pool.query(query, [user])
-        return rows[0].Orden + 1
+        return rows[0].Orden
     } catch (error) {
         console.log(error)
     }
