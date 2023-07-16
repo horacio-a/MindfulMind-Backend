@@ -25,7 +25,7 @@ router.post('/newtask/:token', async function (req, res, next) {
 });
 
 router.post('/ReOrder', async function (req, res, next) {
-    const obj = req.body
+    const obj = req.body.obj
     console.log(obj.data)
     const query = ['UPDATE tasks SET Orden = CASE id']
     for (let i = 0; i < obj.data.length; i++) {
