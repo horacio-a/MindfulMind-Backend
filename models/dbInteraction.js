@@ -45,7 +45,7 @@ async function updateStateTask(obj, user, id) {
 
 async function GetTaskByUsers(user) {
     try {
-        var query = 'select * from tasks WHERE user = ? ORDER BY Order'
+        var query = 'select * from tasks WHERE user = ?  ORDER BY Orden'
         var rows = await pool.query(query, [user])
         return rows
     } catch (error) {
