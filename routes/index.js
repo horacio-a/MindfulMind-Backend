@@ -24,6 +24,20 @@ router.post('/newtask/:token', async function (req, res, next) {
     res.json(newTask)
 });
 
+router.post('/ReOrder', async function (req, res, next) {
+    const obj = req.body
+    console.log(obj.data)
+    const query = ['UPDATE tasks SET Orden = CASE id']
+    for (let i = 0; i < obj.data.length; i++) {
+        const element = obj.data[i];
+        query.push(`WHEN ${element.id} THEN ${element.NewOrden}`)
+    }
+    query.push(`END WHERE USER = "${obj.info.user}"`)
+    const response = await db.ReOrderTasks(query.join(' '))
+
+    res.send(response)
+})
+
 
 router.post('/completeTask', async function (req, res, next) {
     const timeStamp = new Date().getTime()
