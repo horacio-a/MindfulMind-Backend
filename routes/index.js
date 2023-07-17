@@ -26,16 +26,33 @@ router.post('/newtask/:token', async function (req, res, next) {
 
 router.post('/ReOrder', async function (req, res, next) {
     const obj = req.body.obj
+    const user = obj.info.user
     console.log(obj.data)
     const query = ['UPDATE tasks SET Orden = CASE id']
     for (let i = 0; i < obj.data.length; i++) {
         const element = obj.data[i];
         query.push(`WHEN ${element.id} THEN ${element.NewOrden}`)
     }
-    query.push(`END WHERE USER = "${obj.info.user}"`)
+    query.push(`END WHERE USER = "${user}"`)
     const response = await db.ReOrderTasks(query.join(' '))
+    async function Tasks() {
 
-    res.send(response)
+        const data = await db.GetTaskByUsers(user)
+        let taskComplete = 0
+        for (let i = 0; i < data.length; i++) {
+            const element = data[i];
+            if (element.completed === 1) {
+                taskComplete = taskComplete + 1
+            }
+        }
+        let porcentaje = (taskComplete / data.length * 100).toFixed(0) + '%'
+        const obj = {
+            data,
+            porcentaje: porcentaje
+        }
+        return (obj)
+    }
+    res.json(await Tasks())
 })
 
 
