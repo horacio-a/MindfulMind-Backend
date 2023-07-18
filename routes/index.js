@@ -338,6 +338,7 @@ router.post('/mainDataInitial', async function (req, res, next) {
         function obtenerDiasDelMes() {
             let ID = 1
             const fechaActual = new Date(); // Obtener la fecha actual
+            console.log(fechaActual)
             const año = fechaActual.getFullYear(); // Obtener el año actual
             const mes = fechaActual.getMonth(); // Obtener el mes actual (0-11)
 
