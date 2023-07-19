@@ -13,6 +13,17 @@ async function InsertNewTask(obj) {
     }
 }
 
+async function DeleteTasks(user, id) {
+    try {
+        var query = 'DELETE FROM tasks WHERE id = ? and user = ?'
+        var rows = await pool.query(query, [id, user])
+        return rows
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
 async function ReOrderTasks(query) {
     try {
         let rows = await pool.query(query)
@@ -153,5 +164,5 @@ module.exports = {
     GetTextByUsers, getCalendarTaskByUser, InsertUser, InsertNewTask,
     GetTaskByUsers, GetLoginByUserAndPassword, checkExistence,
     GetTaskForCheck, updateStateTask, FinishFuntion, InsertCalendarTask,
-    GetLastNumberOrder, ReOrderTasks
+    GetLastNumberOrder, ReOrderTasks, DeleteTasks
 }
