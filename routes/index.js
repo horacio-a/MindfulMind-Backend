@@ -62,24 +62,24 @@ router.delete('/DeleteTasks', async function (req, res, next) {
     await db.DeleteTasks(data.user, data.id)
 
     console.log(data.user)
-    // async function Tasks() {
+    async function Tasks() {
 
-    //     const data = await db.GetTaskByUsers(data.user)
-    //     let taskComplete = 0
-    //     for (let i = 0; i < data.length; i++) {
-    //         const element = data[i];
-    //         if (element.completed === 1) {
-    //             taskComplete = taskComplete + 1
-    //         }
-    //     }
-    //     let porcentaje = (taskComplete / data.length * 100).toFixed(0) + '%'
-    //     const obj = {
-    //         data,
-    //         porcentaje: porcentaje
-    //     }
-    //     return (obj)
-    // }
-    res.json('await Tasks()')
+        const response = await db.GetTaskByUsers(data.user)
+        let taskComplete = 0
+        for (let i = 0; i < response.length; i++) {
+            const element = response[i];
+            if (element.completed === 1) {
+                taskComplete = taskComplete + 1
+            }
+        }
+        let porcentaje = (taskComplete / response.length * 100).toFixed(0) + '%'
+        const obj = {
+            response,
+            porcentaje: porcentaje
+        }
+        return (obj)
+    }
+    res.json(await Tasks())
 })
 
 
