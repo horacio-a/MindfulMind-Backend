@@ -17,6 +17,7 @@ async function DeleteTasks(user, id) {
     try {
         var query = 'DELETE FROM tasks WHERE id = ? and user = ?'
         var rows = await pool.query(query, [id, user])
+        console.log(rows)
         return rows
     } catch (error) {
         console.log(error)
