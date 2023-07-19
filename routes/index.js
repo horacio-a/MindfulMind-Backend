@@ -56,9 +56,10 @@ router.post('/ReOrder', async function (req, res, next) {
 })
 
 router.delete('/DeleteTasks', async function (req, res, next) {
-    const data = req.body.DataForDelete
+
+    const data = req.body
     console.log(data)
-    await db.DeleteTasks(data.user, data.id)
+    // await db.DeleteTasks(data.user, data.id)
 
     res.json(data)
 })
