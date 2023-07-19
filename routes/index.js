@@ -74,7 +74,7 @@ router.delete('/DeleteTasks', async function (req, res, next) {
         }
         let porcentaje = (taskComplete / response.length * 100).toFixed(0) + '%'
         const obj = {
-            response,
+            data: response,
             porcentaje: porcentaje
         }
         return (obj)
