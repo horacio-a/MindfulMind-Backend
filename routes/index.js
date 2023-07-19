@@ -60,8 +60,24 @@ router.delete('/DeleteTasks', async function (req, res, next) {
     const data = req.body
     console.log(data)
     await db.DeleteTasks(data.user, data.id)
+    async function Tasks() {
 
-    res.json(data)
+        const data = await db.GetTaskByUsers(data.user)
+        let taskComplete = 0
+        for (let i = 0; i < data.length; i++) {
+            const element = data[i];
+            if (element.completed === 1) {
+                taskComplete = taskComplete + 1
+            }
+        }
+        let porcentaje = (taskComplete / data.length * 100).toFixed(0) + '%'
+        const obj = {
+            data,
+            porcentaje: porcentaje
+        }
+        return (obj)
+    }
+    res.json(await Tasks())
 })
 
 
