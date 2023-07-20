@@ -48,29 +48,16 @@ app.use(function (err, req, res, next) {
   res.render('error');
 });
 var axios = require('axios');
-var cron = require('node-cron');
+const schedule = require('node-schedule');
 
-cron.schedule('0 0 * * *', () => {
+
+schedule.scheduleJob('35 45 13 * * *', function () {
   axios.get('http://localhost:3500/FinishFuntion')
-  console.log('hola')
-}, {
-  scheduled: true,
-  timezone: 'America/Argentina/Buenos_Aires',
-  name: 'Change-tasks',
-  recoverMissedExecutions: false,
-
+  console.log('Finish')
 });
 
-cron.schedule('* * * * *', () => {
-  const date = new Date();
-  console.log(`This task is running every minute - ${date.getHours()}:${date.getMinutes()}`)
-}, {
-  scheduled: true,
-  timezone: 'America/Argentina/Buenos_Aires',
-  name: 'simple-task',
-  recoverMissedExecutions: false,
+schedule.scheduleJob('* * * * *', function () {
+  console.log('This job actually ran at ' + new Date());
 });
-
-
 
 module.exports = app;
