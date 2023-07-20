@@ -361,11 +361,9 @@ router.post('/mainDataInitial', async function (req, res, next) {
         const user = RequestData.Calendar.user
         const idCalendar = RequestData.Calendar.idCalendar
         const calendarTasks = await db.getCalendarTaskByUser(user, idCalendar)
-        // console.log(calendarTasks)
         function obtenerDiasDelMes() {
             let ID = 1
             const fechaActual = new Date(); // Obtener la fecha actual
-            fechaActual.setUTCHours(fechaActual.getUTCHours() - 3);
 
             console.log(fechaActual)
             const año = fechaActual.getFullYear(); // Obtener el año actual
@@ -381,16 +379,13 @@ router.post('/mainDataInitial', async function (req, res, next) {
                 const DaysTask = []
                 let taresEsteDia = false
                 const fecha = new Date(año, mes, i); // Crear una fecha con el día actual
-                fecha.setUTCHours(fecha.getUTCHours() - 3);
 
                 const diaSemana = fecha.toLocaleDateString('es-ES', { weekday: 'long' }); // Obtener el día de la semana como una cadena de texto
                 for (let index = 0; index < calendarTasks.length; index++) {
                     const element = calendarTasks[index];
 
                     taksDate = new Date(element.date)
-                    taksDate.setUTCHours(taksDate.getUTCHours() - 3);
                     if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
-                        console.log(taksDate)
                         taresEsteDia = true
                         DaysTask.push(element)
                     }
