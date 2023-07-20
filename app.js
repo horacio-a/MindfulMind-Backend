@@ -51,7 +51,7 @@ var axios = require('axios');
 const schedule = require('node-schedule');
 
 
-schedule.scheduleJob('35 45 13 * * *', function () {
+schedule.scheduleJob('0 0 * * *', function () {
   axios.get('http://localhost:3500/FinishFuntion')
   console.log('Finish')
 });
