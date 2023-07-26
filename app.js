@@ -57,7 +57,10 @@ schedule.scheduleJob('0 0 * * *', function () {
 });
 
 schedule.scheduleJob('* * * * *', function () {
-  console.log('This job actually ran at ' + new Date());
+  // const date = new Date()
+  // const timeStamp = date.getTime()
+  // console.log('This job actually ran at ' + date);
+  // console.log('entre ', timeStamp, ' y ', timeStamp + 60000)
 });
 
 module.exports = app;
