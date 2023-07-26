@@ -3,7 +3,11 @@ var router = express.Router();
 var axios = require('axios');
 var db = require('../models/dbInteraction')
 var md5 = require('md5');
-
+const { Expo } = require('expo-server-sdk')
+const nodemailer = require("nodemailer");
+const transporter = require('../nodeMailer/mailerconfig')
+var fs = require('fs');
+var handlebars = require('handlebars');
 
 
 router.post('/newtask/:token', async function (req, res, next) {
@@ -518,16 +522,211 @@ router.post('/mainDataInitial', async function (req, res, next) {
 
 router.post('/AddCalendarTask', async function (req, res, next) {
     const obj = req.body
-    if (obj.info.Allday) {
-        db.InsertCalendarTask(obj.data)
-    } else {
+    const newdata = []
 
+
+    if (!obj.info.Allday) {
         obj.data.intialHour = obj.data.intialHour.split('T')[0] + 'T00:00:00.000Z'
         obj.data.finishHour = obj.data.finishHour.split('T')[0] + 'T23:59:59.999Z'
-
-        db.InsertCalendarTask(obj.data)
     }
-    res.json({ request: true })
+
+    switch (obj.info.repeat) {
+        case 'Todas las semanas':
+
+            function obtenerDiasIgualesHastaFinDeAnio(fechaString) {
+                const fecha = new Date(fechaString)
+                // Obtener el día de la semana (0 = domingo, 1 = lunes, ..., 6 = sábado)
+                const diaSemana = fecha.getDay();
+
+                // Crear una copia de la fecha para no modificar la original
+                const fechaActual = new Date(fecha);
+
+                // Crear un arreglo para almacenar las fechas que cumplan con la condición
+                const fechasIguales = [];
+
+                // Iterar hasta el final del año
+                while (fechaActual.getFullYear() === fecha.getFullYear()) {
+                    if (fechaActual.getDay() === diaSemana) {
+                        // Agregar una copia de la fecha actual al arreglo
+                        fechasIguales.push(new Date(fechaActual));
+                    }
+
+                    // Incrementar la fecha en un día
+                    fechaActual.setDate(fechaActual.getDate() + 1);
+                }
+
+                return fechasIguales;
+            }
+
+            const fechasIguales = obtenerDiasIgualesHastaFinDeAnio(obj.data.date);
+            for (let i = 0; i < fechasIguales.length; i++) {
+                const element = fechasIguales[i];
+                newdata.push({
+                    "user": obj.data.user,
+                    "Title": obj.data.Title,
+                    "intialHour": element.toISOString().split('T')[0] + 'T' + obj.data.intialHour.split('T')[1],
+                    "finishHour": element.toISOString().split('T')[0] + 'T' + obj.data.finishHour.split('T')[1],
+                    "idCalendar": obj.data.idCalendar,
+                    "description": obj.data.description,
+                    "date": element.toISOString(),
+                    "colorHex": obj.data.colorHex,
+                    "category": obj.data.category
+                })
+            }
+
+            break;
+        case 'Todos los meses':
+
+            function obtenerMismoDiaEnCadaMes(fechaString) {
+                const fecha = new Date(fechaString)
+
+                const meses = 12; // Total de meses en el año
+                const resultado = [];
+
+                // Obtener el día del mes de la fecha proporcionada
+                const dia = fecha.getDate();
+
+                // Obtener el año de la fecha proporcionada
+                const anio = fecha.getFullYear();
+
+                // Iterar por cada mes del año
+                for (let mes = fecha.getMonth(); mes < meses; mes++) {
+                    // Crear una nueva fecha usando el mismo día, el mes actual (más 1, ya que los meses en JavaScript son 0 indexados) y el mismo año.
+                    const nuevaFecha = new Date(anio, mes, dia);
+                    resultado.push(nuevaFecha);
+                }
+
+                return resultado;
+            }
+            const fechasEnCadaMes = obtenerMismoDiaEnCadaMes(obj.data.date);
+            for (let i = 0; i < fechasEnCadaMes.length; i++) {
+                const element = fechasEnCadaMes[i];
+                newdata.push({
+                    "user": obj.data.user,
+                    "Title": obj.data.Title,
+                    "intialHour": element.toISOString().split('T')[0] + 'T' + obj.data.intialHour.split('T')[1],
+                    "finishHour": element.toISOString().split('T')[0] + 'T' + obj.data.finishHour.split('T')[1],
+                    "idCalendar": obj.data.idCalendar,
+                    "description": obj.data.description,
+                    "date": element.toISOString(),
+                    "colorHex": obj.data.colorHex,
+                    "category": obj.data.category
+                })
+            }
+
+
+            break;
+        case 'Todos los años':
+            function obtenerMismoDiaProximos10Anios(fechaString) {
+                const fecha = new Date(fechaString)
+
+                const anios = 10; // Cantidad de años a obtener
+                const resultado = [];
+
+                // Obtener el día del mes de la fecha proporcionada
+                const dia = fecha.getDate();
+
+                // Obtener el mes de la fecha proporcionada (los meses en JavaScript son 0-indexados)
+                const mes = fecha.getMonth();
+
+                // Obtener el año de la fecha proporcionada
+                const anio = fecha.getFullYear();
+
+                // Iterar para los próximos 10 años
+                for (let i = 0; i < anios; i++) {
+                    const nuevoAnio = anio + i;
+                    // Crear una nueva fecha usando el mismo día, el mismo mes y el nuevo año.
+                    const nuevaFecha = new Date(nuevoAnio, mes, dia);
+                    resultado.push(nuevaFecha);
+                }
+
+                return resultado;
+            }
+            const fechasProximos10Anios = obtenerMismoDiaProximos10Anios(obj.data.date);
+
+            for (let i = 0; i < fechasProximos10Anios.length; i++) {
+                const element = fechasProximos10Anios[i];
+                newdata.push({
+                    "user": obj.data.user,
+                    "Title": obj.data.Title,
+                    "intialHour": element.toISOString().split('T')[0] + 'T' + obj.data.intialHour.split('T')[1],
+                    "finishHour": element.toISOString().split('T')[0] + 'T' + obj.data.finishHour.split('T')[1],
+                    "idCalendar": obj.data.idCalendar,
+                    "description": obj.data.description,
+                    "date": element.toISOString(),
+                    "colorHex": obj.data.colorHex,
+                    "category": obj.data.category
+                })
+            }
+
+            break;
+        default:
+            newdata.push({
+                "user": obj.data.user,
+                "Title": obj.data.Title,
+                "intialHour": obj.data.intialHour,
+                "finishHour": obj.data.finishHour,
+                "idCalendar": obj.data.idCalendar,
+                "description": obj.data.description,
+                "date": obj.data.date,
+                "colorHex": obj.data.colorHex,
+                "category": obj.data.category
+            })
+            break;
+    }
+
+
+    switch (obj.info.NotificacionTime) {
+        case '10 minutos antes':
+            for (let i = 0; i < newdata.length; i++) {
+                const element = newdata[i];
+                element.notificationFilter = new Date(element.intialHour).getTime() - 600000
+                const tests = new Date(element.intialHour).getTime() - 600000
+                console.log(new Date(tests))
+            }
+            break;
+        case '1 hora antes':
+            for (let i = 0; i < newdata.length; i++) {
+                const element = newdata[i];
+                element.notificationFilter = new Date(element.intialHour).getTime() - 3600000
+                const tests = new Date(element.intialHour).getTime() - 3600000
+                console.log(new Date(tests))
+            }
+            break;
+        case '1 dia antes':
+            for (let i = 0; i < newdata.length; i++) {
+                const element = newdata[i];
+                element.notificationFilter = new Date(element.intialHour).getTime() - 86400000
+                const tests = new Date(element.intialHour).getTime() - 86400000
+                console.log(new Date(tests))
+            }
+            break;
+        default:
+            for (let i = 0; i < newdata.length; i++) {
+                const element = newdata[i];
+                element.notificationFilter = new Date(element.intialHour).getTime()
+                const tests = new Date(element.intialHour).getTime()
+                console.log(new Date(tests))
+            }
+            break;
+    }
+
+    function createQuery(data) {
+        const arryQuery = []
+        arryQuery.push('INSERT INTO calendar (user, title, description, date, intialHour, finishHour, colorHex, category, idCalendar, notificationFilter) VALUES ')
+        for (let i = 0; i < data.length; i++) {
+            const element = data[i];
+            arryQuery.push(`("${element.user}" , "${element.Title}", "${element.description}", "${element.date}", "${element.intialHour}", "${element.finishHour}", "${element.colorHex}", "${element.category}", "${element.idCalendar}", ${element.notificationFilter} )`)
+            if (i !== data.length - 1) {
+                arryQuery.push(',')
+            }
+        }
+        return arryQuery.join(' ')
+    }
+
+    db.InsertCalendarTaskWithQuery(createQuery(newdata))
+
+    res.json(newdata)
 })
 
 router.get('/FinishFuntion', async function (req, res, next) {
@@ -537,4 +736,201 @@ router.get('/FinishFuntion', async function (req, res, next) {
 })
 
 
+
+router.post('/SendNotification', async function (req, res, next) {
+    const somePushTokens = req.body
+    // Create a new Expo SDK client
+    // optionally providing an access token if you have enabled push security
+    let expo = new Expo();
+
+    // Create the messages that you want to send to clients
+    let messages = [];
+
+
+    for (let item of somePushTokens) {
+        console.log(item)
+        // Each push token looks like ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]
+
+        // Check that all your push tokens appear to be valid Expo push tokens
+        if (!Expo.isExpoPushToken(item.pushToken)) {
+            console.error(`Push token ${item.pushToken} is not a valid Expo push token`);
+            continue;
+        }
+
+        // Construct a message (see https://docs.expo.io/push-notifications/sending-notifications/)
+        messages.push({
+            title: item.title,
+            to: item.pushToken,
+            sound: 'default',
+            body: item.Body,
+            data: { withSome: 'data' },
+        })
+    }
+
+    // The Expo push notification service accepts batches of notifications so
+    // that you don't need to send 1000 requests to send 1000 notifications. We
+    // recommend you batch your notifications to reduce the number of requests
+    // and to compress them (notifications with similar content will get
+    // compressed).
+    let chunks = expo.chunkPushNotifications(messages);
+    let tickets = [];
+    (async () => {
+        // Send the chunks to the Expo push notification service. There are
+        // different strategies you could use. A simple one is to send one chunk at a
+        // time, which nicely spreads the load out over time:
+        for (let chunk of chunks) {
+            try {
+                let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+                console.log(ticketChunk);
+                tickets.push(...ticketChunk);
+                // NOTE: If a ticket contains an error code in ticket.details.error, you
+                // must handle it appropriately. The error codes are listed in the Expo
+                // documentation:
+                // https://docs.expo.io/push-notifications/sending-notifications/#individual-errors
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    })();
+
+
+    // Later, after the Expo push notification service has delivered the
+    // notifications to Apple or Google (usually quickly, but allow the the service
+    // up to 30 minutes when under load), a "receipt" for each notification is
+    // created. The receipts will be available for at least a day; stale receipts
+    // are deleted.
+    //
+    // The ID of each receipt is sent back in the response "ticket" for each
+    // notification. In summary, sending a notification produces a ticket, which
+    // contains a receipt ID you later use to get the receipt.
+    //
+    // The receipts may contain error codes to which you must respond. In
+    // particular, Apple or Google may block apps that continue to send
+    // notifications to devices that have blocked notifications or have uninstalled
+    // your app. Expo does not control this policy and sends back the feedback from
+    // Apple and Google so you can handle it appropriately.
+    let receiptIds = [];
+    for (let ticket of tickets) {
+        // NOTE: Not all tickets have IDs; for example, tickets for notifications
+        // that could not be enqueued will have error information and no receipt ID.
+        if (ticket.id) {
+            receiptIds.push(ticket.id);
+        }
+    }
+
+    let receiptIdChunks = expo.chunkPushNotificationReceiptIds(receiptIds);
+    (async () => {
+        // Like sending notifications, there are different strategies you could use
+        // to retrieve batches of receipts from the Expo service.
+        for (let chunk of receiptIdChunks) {
+            try {
+                let receipts = await expo.getPushNotificationReceiptsAsync(chunk);
+                console.log(receipts);
+
+                // The receipts specify whether Apple or Google successfully received the
+                // notification and information about an error, if one occurred.
+                for (let receiptId in receipts) {
+                    let { status, message, details } = receipts[receiptId];
+                    if (status === 'ok') {
+                        continue;
+                    } else if (status === 'error') {
+                        console.error(
+                            `There was an error sending a notification: ${message}`
+                        );
+                        if (details && details.error) {
+                            // The error codes are listed in the Expo documentation:
+                            // https://docs.expo.io/push-notifications/sending-notifications/#individual-errors
+                            // You must handle the errors appropriately.
+                            console.error(`The error code is ${details.error}`);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    })();
+    res.json(tickets)
+})
+
+const templete = require('../nodeMailer/templete')
+
+router.post('/Authcod/forgetpassword', async function (req, res, next) {
+
+
+
+
+
+    const data = req.body.data
+    const check = await db.checkExistence(data.user, data.email)
+    if (check[0] !== undefined) {
+        function generarCodigoAleatorio() {
+            var codigo = '';
+            var caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            for (var i = 0; i < 8; i++) {
+                codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+            }
+            return codigo;
+        }
+        const code = generarCodigoAleatorio()
+
+        await db.UpdateTokenForUser(code, data.email)
+
+        var readHTMLFile = function (path, callback) {
+            fs.readFile(path, { encoding: 'utf-8' }, function (err, html) {
+                if (err) {
+                    callback(err);
+                }
+                else {
+                    callback(null, html);
+                }
+            });
+        };
+
+
+
+        readHTMLFile(__dirname + '/../views/temple.html', function (err, html) {
+            if (err) {
+                console.log('error reading file', err);
+                return;
+            }
+            var template = handlebars.compile(html);
+            var replacements = {
+                code: code
+            };
+            var htmlToSend = template(replacements);
+            var mailOptions = {
+                from: 'Olvidates tu contraseña mindfulmind', // sender address
+                to: "horaciomatiasalbornoz@gmail.com", // list of receivers
+                subject: "Hello ✔", // Subject line
+                html: htmlToSend
+            };
+            transporter.sendMail(mailOptions, function (error, response) {
+                if (error) {
+                    console.log(error);
+                }
+            });
+        });
+
+
+        res.json({
+            code
+        })
+    } else {
+        res.json({
+            error: 'Email no encontrado'
+        })
+    }
+
+
+
+
+
+})
+
+
+
+
 module.exports = router;
+
+
