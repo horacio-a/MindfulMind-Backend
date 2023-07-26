@@ -145,6 +145,15 @@ async function InsertCalendarTask(obj) {
     }
 }
 
+async function InsertCalendarTaskWithQuery(query) {
+    try {
+        let rows = await pool.query(query)
+        return (rows)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 
 async function GetLastNumberOrder(user) {
     try {
@@ -158,6 +167,16 @@ async function GetLastNumberOrder(user) {
 
 
 
+async function UpdateTokenForUser(token, email) {
+    try {
+        let query = 'UPDATE users SET token= ? WHERE email = ?'
+        let rows = await pool.query(query, [token, email])
+        return rows
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 
 
 
@@ -165,5 +184,6 @@ module.exports = {
     GetTextByUsers, getCalendarTaskByUser, InsertUser, InsertNewTask,
     GetTaskByUsers, GetLoginByUserAndPassword, checkExistence,
     GetTaskForCheck, updateStateTask, FinishFuntion, InsertCalendarTask,
-    GetLastNumberOrder, ReOrderTasks, DeleteTasks
+    GetLastNumberOrder, ReOrderTasks, DeleteTasks, InsertCalendarTaskWithQuery,
+    UpdateTokenForUser
 }
