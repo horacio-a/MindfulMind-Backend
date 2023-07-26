@@ -177,7 +177,15 @@ async function UpdateTokenForUser(token, email) {
     }
 }
 
-
+async function checkAuthcode(token, email) {
+    try {
+        let query = 'SELECT * FROM `users` WHERE token = ? and email = ?'
+        let rows = await pool.query(query, [token, email])
+        return rows
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 
 module.exports = {
@@ -185,5 +193,5 @@ module.exports = {
     GetTaskByUsers, GetLoginByUserAndPassword, checkExistence,
     GetTaskForCheck, updateStateTask, FinishFuntion, InsertCalendarTask,
     GetLastNumberOrder, ReOrderTasks, DeleteTasks, InsertCalendarTaskWithQuery,
-    UpdateTokenForUser
+    UpdateTokenForUser, checkAuthcode
 }
