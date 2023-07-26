@@ -926,6 +926,36 @@ router.post('/Authcod/forgetpassword', async function (req, res, next) {
 
 })
 
+router.post('/checkAuthcode', async function (req, res, next) {
+    const data = req.body.data
+    const response = await db.checkAuthcode(data.token, data.email)
+    if (response[0] !== undefined) {
+
+
+        function generarCodigoAleatorio() {
+            var codigo = '';
+            var caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            for (var i = 0; i < 8; i++) {
+                codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+            }
+            return codigo;
+        }
+        const code = generarCodigoAleatorio()
+
+        await db.UpdateTokenForUser(code, data.email)
+
+        res.json({
+            Authcode: true
+        })
+
+    } else {
+        res.json({
+            Authcode: false
+        })
+    }
+
+
+})
 
 
 
