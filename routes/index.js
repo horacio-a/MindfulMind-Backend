@@ -853,16 +853,13 @@ router.post('/SendNotification', async function (req, res, next) {
     res.json(tickets)
 })
 
-const templete = require('../nodeMailer/templete')
 
 router.post('/Authcod/forgetpassword', async function (req, res, next) {
 
-
-
-
-
     const data = req.body.data
+    console.log(data.email)
     const check = await db.checkExistence(data.user, data.email)
+    console.log(check)
     if (check[0] !== undefined) {
         function generarCodigoAleatorio() {
             var codigo = '';
@@ -889,7 +886,7 @@ router.post('/Authcod/forgetpassword', async function (req, res, next) {
 
 
 
-        readHTMLFile(__dirname + '/../views/temple.html', function (err, html) {
+        readHTMLFile(__dirname + '/../views/temple.html', async function (err, html) {
             if (err) {
                 console.log('error reading file', err);
                 return;
@@ -900,12 +897,13 @@ router.post('/Authcod/forgetpassword', async function (req, res, next) {
             };
             var htmlToSend = template(replacements);
             var mailOptions = {
-                from: 'Olvidates tu contraseña mindfulmind', // sender address
-                to: "horaciomatiasalbornoz@gmail.com", // list of receivers
-                subject: "Hello ✔", // Subject line
+                from: 'mindfulmindsuport@gmail.com',
+                to: data.email,
+                subject: "Olvidates tu contraseña mindfulmind",
                 html: htmlToSend
             };
             transporter.sendMail(mailOptions, function (error, response) {
+                console.log(response.messageId)
                 if (error) {
                     console.log(error);
                 }
