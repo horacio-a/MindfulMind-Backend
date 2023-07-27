@@ -167,10 +167,10 @@ async function GetLastNumberOrder(user) {
 
 
 
-async function UpdateTokenForUser(token, email) {
+async function UpdateTokenForUser(token, email, lastCode) {
     try {
-        let query = 'UPDATE users SET token= ? WHERE email = ?'
-        let rows = await pool.query(query, [token, email])
+        let query = 'UPDATE users SET PrevToken = ?, token = ? WHERE email = ?'
+        let rows = await pool.query(query, [lastCode, token, email])
         return rows
     } catch (error) {
         console.log(error)
@@ -187,11 +187,34 @@ async function checkAuthcode(token, email) {
     }
 }
 
+async function changePassword(password, email) {
+    try {
+        let query = 'UPDATE users SET password= ? WHERE email = ?'
+        let rows = await pool.query(query, [password, email])
+        return rows
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function CheckPreviousPasswordChange(password, email) {
+    try {
+        let query = 'SELECT * FROM users WHERE email = ? and PrevToken = ?'
+        let rows = await pool.query(query, [email, password])
+        return rows
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+
+
 
 module.exports = {
     GetTextByUsers, getCalendarTaskByUser, InsertUser, InsertNewTask,
     GetTaskByUsers, GetLoginByUserAndPassword, checkExistence,
     GetTaskForCheck, updateStateTask, FinishFuntion, InsertCalendarTask,
     GetLastNumberOrder, ReOrderTasks, DeleteTasks, InsertCalendarTaskWithQuery,
-    UpdateTokenForUser, checkAuthcode
+    UpdateTokenForUser, checkAuthcode, changePassword, CheckPreviousPasswordChange
 }
