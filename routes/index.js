@@ -857,9 +857,7 @@ router.post('/SendNotification', async function (req, res, next) {
 router.post('/Authcod/forgetpassword', async function (req, res, next) {
 
     const data = req.body.data
-    console.log(data.email)
     const check = await db.checkExistence(data.user, data.email)
-    console.log(check)
     if (check[0] !== undefined) {
         function generarCodigoAleatorio() {
             var codigo = '';
@@ -871,7 +869,7 @@ router.post('/Authcod/forgetpassword', async function (req, res, next) {
         }
         const code = generarCodigoAleatorio()
 
-        await db.UpdateTokenForUser(code, data.email)
+        await db.UpdateTokenForUser(code, data.email, check[0].token)
 
         var readHTMLFile = function (path, callback) {
             fs.readFile(path, { encoding: 'utf-8' }, function (err, html) {
@@ -930,8 +928,6 @@ router.post('/checkAuthcode', async function (req, res, next) {
     const data = req.body.data
     const response = await db.checkAuthcode(data.token, data.email)
     if (response[0] !== undefined) {
-
-
         function generarCodigoAleatorio() {
             var codigo = '';
             var caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -941,9 +937,7 @@ router.post('/checkAuthcode', async function (req, res, next) {
             return codigo;
         }
         const code = generarCodigoAleatorio()
-
-        await db.UpdateTokenForUser(code, data.email)
-
+        await db.UpdateTokenForUser(code, data.email, response[0].token)
         res.json({
             Authcode: true
         })
@@ -957,7 +951,34 @@ router.post('/checkAuthcode', async function (req, res, next) {
 
 })
 
+router.post('/ChangePassword', async function (req, res, next) {
+    const data = req.body.data
+    try {
+        const response = await db.CheckPreviousPasswordChange(data.token, data.email)
+        if (response[0] !== undefined) {
+            await db.changePassword(md5(data.password), data.email)
+            res.json({
+                Change: true
+            })
+        } else {
+            res.json({
+                error,
+                msg: 'Tuvimos un problema, Intente mas tarde por favor'
+            })
+        }
 
+    } catch (error) {
+        console.log(error)
+        res.json({
+            error,
+            msg: 'Tuvimos un problema, Intente mas tarde por favor'
+        })
+    }
+
+
+
+
+})
 
 module.exports = router;
 
