@@ -1,10 +1,102 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>{{title}}</title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    {{{body}}}
-  </body>
+
+<head>
+  <title>{{title}}</title>
+  <link rel='stylesheet' href='./style.css' />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0%;
+      font-family: 'Lato', sans-serif;
+
+    }
+
+    header {
+      width: 100%;
+      height: 10vh;
+      box-shadow: 0px 3.15789px 18.1579px rgba(0, 0, 0, 0.25);
+      background: #fff;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 999px;
+      display: flex;
+      align-items: center;
+    }
+
+    .conteinerLogoSheader {
+      width: 5%;
+      height: 100%;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .logoSHeader {
+      width: 50%;
+    }
+
+    .conteinerTxtHeader {
+      width: auto;
+      height: 100%;
+      margin-left: 1.5%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .TxtHeader {
+      font-size: 2.1vh;
+      color: #1E1E1E;
+    }
+
+    .mainContent {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .conteinerTxt {
+      width: 50%;
+      height: 50%;
+      background-color: #1E1E1E;
+      border-radius: 25px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      text-align: center;
+      font-size: 2.75vh;
+      font-weight: 600;
+
+    }
+
+    .btnBack {
+      width: 15%;
+      height: 10%;
+      background-color: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      color: #1E1E1E;
+      font-size: 1.75vh;
+      border-radius: 10px;
+
+    }
+  </style>
+</head>
+
+<body>
+  {{{body}}}
+</body>
+
 </html>
