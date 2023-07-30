@@ -319,7 +319,7 @@ router.post('/login', async function (req, res, next) {
 
 router.post('/register', async function (req, res, next) {
     const data = req.body.obj
-
+    console.log(data)
     const check = await db.checkExistence(data.user, data.email)
 
     function generarCodigoAleatorio() {
