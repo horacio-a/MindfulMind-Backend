@@ -197,10 +197,21 @@ async function changePassword(password, email) {
     }
 }
 
-async function CheckPreviousPasswordChange(password, email) {
+async function CheckPreviousPasswordChange(token, email) {
     try {
         let query = 'SELECT * FROM users WHERE email = ? and PrevToken = ?'
-        let rows = await pool.query(query, [email, password])
+        let rows = await pool.query(query, [email, token])
+        return rows
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+async function ConfirmRegister(email, user) {
+    try {
+        let query = 'UPDATE users SET ConfirmRegister = 1 WHERE email = ? and user = ?'
+        let rows = await pool.query(query, [email, user])
         return rows
     } catch (error) {
         console.log(error)
@@ -209,12 +220,11 @@ async function CheckPreviousPasswordChange(password, email) {
 
 
 
-
-
 module.exports = {
     GetTextByUsers, getCalendarTaskByUser, InsertUser, InsertNewTask,
     GetTaskByUsers, GetLoginByUserAndPassword, checkExistence,
     GetTaskForCheck, updateStateTask, FinishFuntion, InsertCalendarTask,
     GetLastNumberOrder, ReOrderTasks, DeleteTasks, InsertCalendarTaskWithQuery,
-    UpdateTokenForUser, checkAuthcode, changePassword, CheckPreviousPasswordChange
+    UpdateTokenForUser, checkAuthcode, changePassword, CheckPreviousPasswordChange,
+    ConfirmRegister
 }
