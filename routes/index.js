@@ -303,15 +303,24 @@ router.post('/login', async function (req, res, next) {
     const user = req.body.user
     const password = req.body.password
     const data = await db.GetLoginByUserAndPassword(user, password)
-    if (data !== undefined) {
 
-        res.json({
-            authentication: true,
-            user: user,
-        })
+    if (data !== undefined) {
+        if (data.ConfirmRegister != 1) {
+            res.json({
+                authentication: false,
+                errMsg: 'Email no confirmado, porfavor ingrese a su email y confirme su cuenta',
+            })
+        } else {
+            res.json({
+                authentication: true,
+                user: user,
+            })
+        }
+
     } else {
         res.json({
             authentication: false,
+            errMsg: 'No encontramos un usuario con esas credenciales'
         })
     }
 })
