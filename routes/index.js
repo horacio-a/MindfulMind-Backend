@@ -320,7 +320,7 @@ router.post('/login', async function (req, res, next) {
 router.post('/register', async function (req, res, next) {
     const data = req.body.obj
     console.log(data)
-    console.log(md5(data.password))
+    console.log(await md5(data.password))
     const check = await db.checkExistence(data.user, data.email)
 
     function generarCodigoAleatorio() {
