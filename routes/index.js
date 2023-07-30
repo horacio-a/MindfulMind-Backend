@@ -8,6 +8,7 @@ const nodemailer = require("nodemailer");
 const transporter = require('../nodeMailer/mailerconfig')
 var fs = require('fs');
 var handlebars = require('handlebars');
+const { token } = require('morgan');
 
 
 router.post('/newtask/:token', async function (req, res, next) {
@@ -317,16 +318,66 @@ router.post('/login', async function (req, res, next) {
 
 
 router.post('/register', async function (req, res, next) {
-    const data = JSON.parse(req.body.obj)
-    const check = await db.checkExistence(data.user, data.email)
-    if (check[0] === undefined) {
+    const data = req.body.obj
 
+    const check = await db.checkExistence(data.user, data.email)
+
+    function generarCodigoAleatorio() {
+        var codigo = '';
+        var caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        for (var i = 0; i < 8; i++) {
+            codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+        }
+        return codigo;
+    }
+
+    if (check[0] === undefined) {
         let obj = {
             user: data.user,
             password: md5(data.password),
             email: data.email,
+            ConfirmRegister: 0,
+            token: generarCodigoAleatorio(),
+            PrevToken: generarCodigoAleatorio(),
         }
         let response = await db.InsertUser(obj)
+        var readHTMLFile = function (path, callback) {
+            fs.readFile(path, { encoding: 'utf-8' }, function (err, html) {
+                if (err) {
+                    callback(err);
+                }
+                else {
+                    callback(null, html);
+                }
+            });
+        };
+
+
+
+        readHTMLFile(__dirname + '/../views/templeteRegister.html', async function (err, html) {
+            if (err) {
+                console.log('error reading file', err);
+                return;
+            }
+            var template = handlebars.compile(html);
+            var replacements = {
+                Link: ` https://api.mindfulmind.com.ar/user/registerConfirmation/${data.user}/${data.email}`
+            };
+            var htmlToSend = template(replacements);
+            var mailOptions = {
+                from: 'mindfulmindsuport@gmail.com',
+                to: data.email,
+                subject: "Creaste tu cuenta en mindfulmind",
+                html: htmlToSend
+            };
+            transporter.sendMail(mailOptions, function (error, response) {
+                console.log(response.messageId)
+                if (error) {
+                    console.log(error);
+                }
+            });
+        });
+
         res.json({ response, userCreate: true })
     } else {
         let ErrorResponse = { error: { email: false, user: false }, userCreate: false }
