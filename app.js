@@ -10,7 +10,7 @@ var cors = require('cors');
 require('dotenv').config()
 
 var indexRouter = require('./routes/index');
-
+var registerConfirmation = require('./routes/registerConfimation')
 
 
 var app = express();
@@ -28,7 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.use('/', cors(), indexRouter);
-
+app.use('/user', cors(), registerConfirmation)
 
 
 
@@ -47,6 +47,8 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+
 var axios = require('axios');
 const schedule = require('node-schedule');
 
