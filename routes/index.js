@@ -1077,15 +1077,17 @@ router.post('/changeprofilepicture', async function (req, res, next) {
 
 router.post('/changeUsername', async function (req, res, next) {
     const data = req.body.data
-    console.log(data)
-    console.log(req.body)
+
     const login = await db.GetLoginByUserAndPassword(data.user, data.password)
     if (login === undefined) {
         const userEnabled = await db.checkExistence(data.newUser, 'NotEmail')
-        console.log(userEnabled)
-        if (userEnabled[0] !== undefined) {
-            const query = `UPDATE users SET users.user = ${data.newUser} WHERE users.user = ${data.user}; UPDATE calendar SET calendar.user = ${data.newUser} WHERE calendar.user = ${data.user}; UPDATE tasks SET tasks.user = ${data.newUser} WHERE tasks.user = ${data.user}; UPDATE usertexts SET usertexts.user = ${data.newUser} WHERE usertexts.user = ${data.user};`
-            const response = await db.ChangeAllUsername(query)
+        if (userEnabled[0] === undefined) {
+            const queryUser = `UPDATE users SET user = '${data.newUser}'WHERE user = '${data.user}'; `
+            const queryCalendar = `UPDATE calendar SET user = '${data.newUser}' WHERE user = '${data.user}';  `
+            const queryTasks = `UPDATE tasks SET user = '${data.newUser}' WHERE user = '${data.user}';  `
+            const queryText = `UPDATE usertexts SET user = '${data.newUser}' WHERE user = '${data.user}';`
+
+            const response = await db.ChangeAllUsername(queryUser, queryCalendar, queryTasks, queryText)
             res.json({
                 response,
                 err: false
@@ -1104,8 +1106,12 @@ router.post('/changeUsername', async function (req, res, next) {
     }
 
 
-})
 
+
+})
+// 
+// 
+// 
 module.exports = router;
 
 
