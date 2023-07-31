@@ -220,11 +220,22 @@ async function ConfirmRegister(email, user) {
 
 
 
+async function ChangeProfilePicture(ProfilePicture, user) {
+    try {
+        let query = 'UPDATE users SET profilePicture = ? WHERE  user = ?'
+        let rows = await pool.query(query, [ProfilePicture, user])
+        return rows
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
 module.exports = {
     GetTextByUsers, getCalendarTaskByUser, InsertUser, InsertNewTask,
     GetTaskByUsers, GetLoginByUserAndPassword, checkExistence,
     GetTaskForCheck, updateStateTask, FinishFuntion, InsertCalendarTask,
     GetLastNumberOrder, ReOrderTasks, DeleteTasks, InsertCalendarTaskWithQuery,
     UpdateTokenForUser, checkAuthcode, changePassword, CheckPreviousPasswordChange,
-    ConfirmRegister
+    ConfirmRegister, ChangeProfilePicture
 }
