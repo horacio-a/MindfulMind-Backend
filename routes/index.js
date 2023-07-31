@@ -1078,21 +1078,29 @@ router.post('/changeprofilepicture', async function (req, res, next) {
 router.post('/changeUsername', async function (req, res, next) {
     const data = req.body.data
 
-    const userEnabled = await db.checkExistence(data.newUser, 'NotEmail')
-
-    if (userEnabled[0] !== undefined) {
-        const query = `UPDATE users SET users.user = ${data.newUser} WHERE users.user = ${data.user}; UPDATE calendar SET calendar.user = ${data.newUser} WHERE calendar.user = ${data.user}; UPDATE tasks SET tasks.user = ${data.newUser} WHERE tasks.user = ${data.user}; UPDATE usertexts SET usertexts.user = ${data.newUser} WHERE usertexts.user = ${data.user};`
-        const response = await db.ChangeAllUsername(query)
-        res.json({
-            response,
-            err: false
-        })
+    const login = await db.GetLoginByUserAndPassword(data.user, data.password)
+    if (login !== undefined) {
+        const userEnabled = await db.checkExistence(data.newUser, 'NotEmail')
+        if (userEnabled[0] !== undefined) {
+            const query = `UPDATE users SET users.user = ${data.newUser} WHERE users.user = ${data.user}; UPDATE calendar SET calendar.user = ${data.newUser} WHERE calendar.user = ${data.user}; UPDATE tasks SET tasks.user = ${data.newUser} WHERE tasks.user = ${data.user}; UPDATE usertexts SET usertexts.user = ${data.newUser} WHERE usertexts.user = ${data.user};`
+            const response = await db.ChangeAllUsername(query)
+            res.json({
+                response,
+                err: false
+            })
+        } else {
+            res.json({
+                err: true,
+                errMsg: 'Usuario no disponible'
+            })
+        }
     } else {
         res.json({
             err: true,
-            errMsg: 'Usuario no disponible'
+            errMsg: 'Contraseña no valida'
         })
     }
+
 
 })
 
