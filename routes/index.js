@@ -1079,6 +1079,8 @@ router.post('/changeUsername', async function (req, res, next) {
     const data = req.body.data
 
     const login = await db.GetLoginByUserAndPassword(data.user, data.password)
+    console.log(login)
+    console.log(login === undefined)
     if (login === undefined) {
         const userEnabled = await db.checkExistence(data.newUser, 'NotEmail')
         if (userEnabled[0] === undefined) {
