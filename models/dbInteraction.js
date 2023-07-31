@@ -231,11 +231,24 @@ async function ChangeProfilePicture(ProfilePicture, user) {
 }
 
 
+async function ChangeAllUsername(query) {
+    try {
+        let rows = await pool.query(query)
+        return rows
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
+
+
+
 module.exports = {
     GetTextByUsers, getCalendarTaskByUser, InsertUser, InsertNewTask,
     GetTaskByUsers, GetLoginByUserAndPassword, checkExistence,
     GetTaskForCheck, updateStateTask, FinishFuntion, InsertCalendarTask,
     GetLastNumberOrder, ReOrderTasks, DeleteTasks, InsertCalendarTaskWithQuery,
     UpdateTokenForUser, checkAuthcode, changePassword, CheckPreviousPasswordChange,
-    ConfirmRegister, ChangeProfilePicture
+    ConfirmRegister, ChangeProfilePicture, ChangeAllUsername
 }
