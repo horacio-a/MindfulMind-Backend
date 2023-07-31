@@ -1051,7 +1051,7 @@ router.post('/ChangePassword', async function (req, res, next) {
 router.post('/changeprofilepicture', async function (req, res, next) {
     const data = req.body.data
 
-    await db.ChangeProfilePicture(data.ProfilePicture, data.user)
+    await db.ChangeProfilePicture(data.profilePicture, data.user)
 
 })
 
