@@ -311,9 +311,12 @@ router.post('/login', async function (req, res, next) {
                 errMsg: 'Email no confirmado, porfavor ingrese a su email y confirme su cuenta',
             })
         } else {
+
             res.json({
                 authentication: true,
-                user: user,
+                user: data.user,
+                email: data.email,
+                profilePicture: data.profilePicture
             })
         }
 
