@@ -222,7 +222,7 @@ async function ConfirmRegister(email, user) {
 
 async function ChangeProfilePicture(ProfilePicture, user) {
     try {
-        let query = 'UPDATE users SET profilePicture = ? WHERE  user = ?'
+        let query = 'UPDATE users SET profilePicture = ? WHERE user = ?'
         let rows = await pool.query(query, [ProfilePicture, user])
         return rows
     } catch (error) {
@@ -231,9 +231,14 @@ async function ChangeProfilePicture(ProfilePicture, user) {
 }
 
 
-async function ChangeAllUsername(query) {
+async function ChangeAllUsername(queryUser, queryCalendar, queryTasks, queryText) {
     try {
-        let rows = await pool.query(query)
+        let rows = []
+        let User = await pool.query(queryUser)
+        let Calendar = await pool.query(queryCalendar)
+        let Tasks = await pool.query(queryTasks)
+        let Text = await pool.query(queryText)
+        rows.push(User, Calendar, Tasks, Text)
         return rows
     } catch (error) {
         console.log(error)
