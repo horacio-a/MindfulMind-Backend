@@ -1077,7 +1077,8 @@ router.post('/changeprofilepicture', async function (req, res, next) {
 
 router.post('/changeUsername', async function (req, res, next) {
     const data = req.body.data
-
+    console.log(data)
+    console.log(req.body)
     const login = await db.GetLoginByUserAndPassword(data.user, data.password)
     if (login !== undefined) {
         const userEnabled = await db.checkExistence(data.newUser, 'NotEmail')
