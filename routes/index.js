@@ -1045,6 +1045,26 @@ router.post('/ChangePassword', async function (req, res, next) {
 })
 
 
+router.post('/changePasswordWithPass', async function (req, res, next) {
+    const data = req.body.data
+    console.log(data)
+    const response = await db.GetLoginByUserAndPassword(data.user, data.oldpassword)
+    console.log(response)
+    if (response !== undefined) {
+        const change = await db.changePassword(md5(data.newpassword), data.email)
+        res.json({
+            change,
+            err: false
+        })
+    } else {
+        res.json({
+            err: true,
+            errMsg: 'contraseña no valida'
+        })
+    }
+})
+
+
 
 
 
