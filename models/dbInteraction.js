@@ -270,6 +270,17 @@ async function UpdateText(data, id) {
 }
 
 
+async function deleteText(user, id) {
+    try {
+        let query = `DELETE FROM usertexts WHERE user = ? and id = ?`
+        let rows = await pool.query(query, [user, id])
+        return rows
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
 
 
 module.exports = {
@@ -278,6 +289,6 @@ module.exports = {
     GetTaskForCheck, updateStateTask, FinishFuntion, InsertCalendarTask,
     GetLastNumberOrder, ReOrderTasks, DeleteTasks, InsertCalendarTaskWithQuery,
     UpdateTokenForUser, checkAuthcode, changePassword, CheckPreviousPasswordChange,
-    ConfirmRegister, ChangeProfilePicture, ChangeAllUsername, createText, UpdateText
-
+    ConfirmRegister, ChangeProfilePicture, ChangeAllUsername, createText, UpdateText,
+    deleteText
 }
