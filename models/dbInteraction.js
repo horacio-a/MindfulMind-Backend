@@ -258,9 +258,9 @@ async function createText(data) {
     }
 }
 
-async function UpdateText(data) {
+async function UpdateText(data, id) {
     try {
-        let query = 'UPDATE usertexts SET ? WHERE id = ?'
+        let query = `UPDATE usertexts SET ? WHERE id = ${id}`
         let rows = await pool.query(query, [data])
         return rows
     } catch (error) {
