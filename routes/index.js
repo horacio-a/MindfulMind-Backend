@@ -1135,6 +1135,7 @@ router.post('/updatetext', async function (req, res, next) {
         await db.UpdateText(data, id)
         const respose = await db.GetTextByUsers(data.user)
         res.json({
+            data,
             respose
         })
     } catch (error) {
