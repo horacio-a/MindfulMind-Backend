@@ -1124,7 +1124,7 @@ router.post('/createtext', async function (req, res, next) {
         })
     } catch (error) {
         res.json({
-            err: 'error'
+            err: error
         })
     }
 })
@@ -1142,7 +1142,7 @@ router.post('/updatetext', async function (req, res, next) {
         })
     } catch (error) {
         res.json({
-            err: 'error'
+            err: error
         })
     }
 
