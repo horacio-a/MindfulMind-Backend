@@ -258,6 +258,17 @@ async function createText(data) {
     }
 }
 
+async function UpdateText(data) {
+    try {
+        let query = 'UPDATE usertexts SET ? WHERE id = ?'
+        let rows = await pool.query(query, [data])
+        return rows
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
 
 
 
@@ -267,5 +278,6 @@ module.exports = {
     GetTaskForCheck, updateStateTask, FinishFuntion, InsertCalendarTask,
     GetLastNumberOrder, ReOrderTasks, DeleteTasks, InsertCalendarTaskWithQuery,
     UpdateTokenForUser, checkAuthcode, changePassword, CheckPreviousPasswordChange,
-    ConfirmRegister, ChangeProfilePicture, ChangeAllUsername, createText
+    ConfirmRegister, ChangeProfilePicture, ChangeAllUsername, createText, UpdateText
+
 }
