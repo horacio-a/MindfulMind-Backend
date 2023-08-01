@@ -1150,6 +1150,14 @@ router.post('/updatetext', async function (req, res, next) {
 })
 
 
+router.post('/deleteText', async function (req, res, next) {
+    const data = req.body.data
+    await db.deleteText(data.user, data.id)
+    res.json({
+        data
+    })
+})
+
 
 module.exports = router;
 
