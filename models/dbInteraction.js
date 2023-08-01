@@ -247,6 +247,18 @@ async function ChangeAllUsername(queryUser, queryCalendar, queryTasks, queryText
 }
 
 
+async function createText(data) {
+    try {
+        let query = 'insert into usertexts set ?'
+        let rows = await pool.query(query, [data])
+        return rows
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
+
 
 
 module.exports = {
@@ -255,5 +267,5 @@ module.exports = {
     GetTaskForCheck, updateStateTask, FinishFuntion, InsertCalendarTask,
     GetLastNumberOrder, ReOrderTasks, DeleteTasks, InsertCalendarTaskWithQuery,
     UpdateTokenForUser, checkAuthcode, changePassword, CheckPreviousPasswordChange,
-    ConfirmRegister, ChangeProfilePicture, ChangeAllUsername
+    ConfirmRegister, ChangeProfilePicture, ChangeAllUsername, createText
 }
