@@ -1115,9 +1115,9 @@ router.post('/createtext', async function (req, res, next) {
     const data = req.body.data
 
     try {
-        await db.createText(data)
+        const insert = await db.createText(data)
         const response = await db.GetTextByUsers(data.user)
-        data.id = Response.insertId
+        data.id = insert.insertId
         res.json({
             data,
             response
