@@ -1116,10 +1116,11 @@ router.post('/createtext', async function (req, res, next) {
 
     try {
         await db.createText(data)
-        const respose = await db.GetTextByUsers(data.user)
+        const response = await db.GetTextByUsers(data.user)
+        data.id = Response.insertId
         res.json({
             data,
-            respose
+            response
         })
     } catch (error) {
         res.json({
@@ -1133,11 +1134,11 @@ router.post('/updatetext', async function (req, res, next) {
     const id = req.body.id
     try {
         await db.UpdateText(data, id)
-        const respose = await db.GetTextByUsers(data.user)
+        const response = await db.GetTextByUsers(data.user)
         data.id = id
         res.json({
             data,
-            respose
+            response
         })
     } catch (error) {
         res.json({
