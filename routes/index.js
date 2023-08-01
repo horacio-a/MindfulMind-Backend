@@ -1118,6 +1118,7 @@ router.post('/createtext', async function (req, res, next) {
         await db.createText(data)
         const respose = await db.GetTextByUsers(data.user)
         res.json({
+            data,
             respose
         })
     } catch (error) {
