@@ -1109,9 +1109,25 @@ router.post('/changeUsername', async function (req, res, next) {
 
 
 })
-// 
-// 
-// 
+
+
+router.post('/createtext', async function (req, res, next) {
+    const data = req.body.data
+
+    try {
+        await db.createText(data)
+        res.json({
+            data
+        })
+    } catch (error) {
+        res.json({
+            err: 'error'
+        })
+    }
+
+
+})
+
 module.exports = router;
 
 
