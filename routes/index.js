@@ -1124,9 +1124,26 @@ router.post('/createtext', async function (req, res, next) {
             err: 'error'
         })
     }
+})
+
+router.post('/updatetext', async function (req, res, next) {
+    const data = req.body.data
+    const id = req.body.id
+    try {
+        await db.UpdateText(data, id)
+        res.json({
+            data
+        })
+    } catch (error) {
+        res.json({
+            err: 'error'
+        })
+    }
 
 
 })
+
+
 
 module.exports = router;
 
