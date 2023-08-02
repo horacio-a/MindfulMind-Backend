@@ -22,7 +22,7 @@ router.post('/newtask/:token', async function (req, res, next) {
         tasksName: Data.title,
         completed: 0,
         updateDate: timeStamp,
-        Orden: parseInt(OrderNumber) + 1
+        Orden: OrderNumber === undefined ? 1 : parseInt(OrderNumber) + 1
     }
     const Response = await db.InsertNewTask(newTask)
     newTask.id = Response.insertId
