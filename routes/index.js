@@ -10,401 +10,7 @@ var fs = require('fs');
 var handlebars = require('handlebars');
 const { token } = require('morgan');
 
-
-router.post('/newtask/:token', async function (req, res, next) {
-    const timeStamp = new Date().getTime()
-    const Data = req.body
-    console.log(Data.user)
-    const OrderNumber = await db.GetLastNumberOrder(Data.user)
-    console.log(OrderNumber)
-    const newTask = {
-        user: Data.user,
-        tasksName: Data.title,
-        completed: 0,
-        updateDate: timeStamp,
-        Orden: OrderNumber === undefined ? 1 : parseInt(OrderNumber) + 1
-    }
-    const Response = await db.InsertNewTask(newTask)
-    newTask.id = Response.insertId
-    res.json(newTask)
-});
-
-router.post('/ReOrder', async function (req, res, next) {
-    const obj = req.body.obj
-    const user = obj.info.user
-    console.log(obj.data)
-    const query = ['UPDATE tasks SET Orden = CASE id']
-    for (let i = 0; i < obj.data.length; i++) {
-        const element = obj.data[i];
-        query.push(`WHEN ${element.id} THEN ${element.NewOrden}`)
-    }
-    query.push(`END WHERE USER = "${user}"`)
-    const response = await db.ReOrderTasks(query.join(' '))
-    async function Tasks() {
-
-        const data = await db.GetTaskByUsers(user)
-        let taskComplete = 0
-        for (let i = 0; i < data.length; i++) {
-            const element = data[i];
-            if (element.completed === 1) {
-                taskComplete = taskComplete + 1
-            }
-        }
-        let porcentaje = (taskComplete / data.length * 100).toFixed(0) + '%'
-        const obj = {
-            data,
-            porcentaje: porcentaje
-        }
-        return (obj)
-    }
-    res.json(await Tasks())
-})
-
-router.delete('/DeleteTasks', async function (req, res, next) {
-
-    const data = req.body
-    console.log(data)
-    await db.DeleteTasks(data.user, data.id)
-
-    console.log(data.user)
-    async function Tasks() {
-
-        const response = await db.GetTaskByUsers(data.user)
-        let taskComplete = 0
-        for (let i = 0; i < response.length; i++) {
-            const element = response[i];
-            if (element.completed === 1) {
-                taskComplete = taskComplete + 1
-            }
-        }
-        let porcentaje = (taskComplete / response.length * 100).toFixed(0) + '%'
-        const obj = {
-            data: response,
-            porcentaje: porcentaje
-        }
-        return (obj)
-    }
-    res.json(await Tasks())
-})
-
-
-router.post('/completeTask', async function (req, res, next) {
-    const timeStamp = new Date().getTime()
-    const dataReq = JSON.parse(req.body.obj)
-    const response = await db.GetTaskForCheck(dataReq.user, dataReq.id)
-    if (response[0].completed === 0) {
-        const obj = { id: dataReq.id, user: dataReq.user, tasksName: dataReq.tasksName, completed: 1, updateDate: timeStamp }
-        const alterRows = await db.updateStateTask(obj, dataReq.user, dataReq.id)
-        const data = await db.GetTaskByUsers(dataReq.user)
-
-        let taskComplete = 0
-        for (let i = 0; i < data.length; i++) {
-            const element = data[i];
-            if (element.completed === 1) {
-                taskComplete = taskComplete + 1
-            }
-        }
-        let porcentaje = (taskComplete / data.length * 100).toFixed(0) + '%'
-        res.json({ work: true, change: 0, data, porcentaje })
-    } else {
-        const obj = { id: dataReq.id, user: dataReq.user, tasksName: dataReq.tasksName, completed: 0, updateDate: timeStamp }
-        const alterRows = await db.updateStateTask(obj, dataReq.user, dataReq.id)
-
-        const data = await db.GetTaskByUsers(dataReq.user)
-        let taskComplete = 0
-        for (let i = 0; i < data.length; i++) {
-            const element = data[i];
-            if (element.completed === 1) {
-                taskComplete = taskComplete + 1
-            }
-        }
-        let porcentaje = (taskComplete / data.length * 100).toFixed(0) + '%'
-        res.json({ work: true, change: 1, data, porcentaje })
-    }
-})
-
-router.get('/task/:users', async function (req, res, next) {
-    const user = req.params.users
-    const data = await db.GetTaskByUsers(user)
-    let taskComplete = 0
-    for (let i = 0; i < data.length; i++) {
-        const element = data[i];
-        if (element.completed === 1) {
-            taskComplete = taskComplete + 1
-        }
-    }
-    let porcentaje = (taskComplete / data.length * 100).toFixed(0) + '%'
-    const obj = {
-        data,
-        porcentaje: porcentaje
-    }
-    res.json(obj)
-})
-
-router.get('/text/:users', async function (req, res, next) {
-    const user = req.params.users
-    const data = await db.GetTextByUsers(user)
-    res.json(data)
-})
-
-
-router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
-
-    async function Calendar() {
-        const user = req.params.user
-        const idCalendar = req.params.idCalendar
-        const calendarTasks = await db.getCalendarTaskByUser(user, idCalendar)
-        function obtenerDiasDelMes() {
-            let ID = 1
-            const fechaActual = new Date(); // Obtener la fecha actual
-            const año = fechaActual.getFullYear(); // Obtener el año actual
-            const mes = fechaActual.getMonth(); // Obtener el mes actual (0-11)
-
-            const primerDia = new Date(año, mes, 1); // Crear una fecha con el primer día del mes
-            const ultimoDia = new Date(año, mes + 1, 0); // Crear una fecha con el último día del mes
-
-            const diasDelMes = [];
-
-            // Recorrer desde el primer día hasta el último día del mes
-            for (let i = primerDia.getDate(); i <= ultimoDia.getDate(); i++) {
-                const DaysTask = []
-                let taresEsteDia = false
-                const fecha = new Date(año, mes, i); // Crear una fecha con el día actual
-                const diaSemana = fecha.toLocaleDateString('es-ES', { weekday: 'long' }); // Obtener el día de la semana como una cadena de texto
-                for (let index = 0; index < calendarTasks.length; index++) {
-                    const element = calendarTasks[index];
-
-                    taksDate = new Date(element.date)
-                    if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
-                        taresEsteDia = true
-                        DaysTask.push(element)
-                    }
-                }
-                if (fecha.getDate() == fechaActual.getDate()) {
-                    if (taresEsteDia === true) {
-                        diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: true, requestTask: true, Tasks: DaysTask });
-                    } else {
-                        diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: true, requestTask: false });
-                    }
-                } else {
-                    if (taresEsteDia === true) {
-                        diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: false, requestTask: true, Tasks: DaysTask });
-                    } else {
-                        diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: false, requestTask: false });
-                    }
-                }
-                taresEsteDia = false
-                ID = ID + 1
-            }
-
-            const diasDeLaSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado']
-            let numAnterior = 0
-
-
-            for (let i = 0; i < diasDeLaSemana.length; i++) {
-                const element = diasDeLaSemana[i];
-                if (diasDelMes[0].diaSemana === element) {
-                    numAnterior = i
-                }
-            }
-
-            function obtenerDiasAtras(NewFecha, cantidadDias) {
-                if (cantidadDias != 0) {
-                    for (let i = 1; i < cantidadDias + 1; i++) {
-                        let taresEsteDia = false
-                        let DaysTask = []
-                        const fecha = new Date(NewFecha); // Crear una nueva instancia de Date con la fecha dada
-                        fecha.setDate(fecha.getDate() - i); // Restar "i" días a la fecha dada
-                        const diaSemana = fecha.toLocaleDateString('es-ES', { weekday: 'long' });
-                        for (let index = 0; index < calendarTasks.length; index++) {
-                            const element = calendarTasks[index];
-                            taksDate = new Date(calendarTasks[index].date)
-                            if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
-                                taresEsteDia = true
-                                DaysTask.push(element)
-
-                            }
-                        }
-                        if (taresEsteDia === true) {
-                            diasDelMes.unshift({ id: ID, number: fecha.getDate(), diaSemana, fecha, ThisMount: false, Today: false, requestTask: true, Tasks: DaysTask });
-                        } else {
-                            diasDelMes.unshift({ id: ID, number: fecha.getDate(), diaSemana, fecha, ThisMount: false, Today: false, requestTask: false });
-                        }
-                        ID = ID + 1
-                        taresEsteDia = false
-
-                    }
-                }
-            }
-            obtenerDiasAtras(diasDelMes[0].fecha, numAnterior)
-
-            function obtenerDiasDelante(NewFecha, cantidadDias) {
-                if (cantidadDias != 0) {
-                    for (let i = 1; i < cantidadDias + 1; i++) {
-                        let taresEsteDia = false
-                        let DaysTask = []
-                        const fecha = new Date(NewFecha); // Crear una nueva instancia de Date con la fecha dada
-                        fecha.setDate(fecha.getDate() + i); // Restar "i" días a la fecha dada
-                        const diaSemana = fecha.toLocaleDateString('es-ES', { weekday: 'long' });
-                        for (let index = 0; index < calendarTasks.length; index++) {
-                            const element = calendarTasks[index];
-                            taksDate = new Date(calendarTasks[index].date)
-                            if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
-                                taresEsteDia = true
-                                DaysTask.push(element)
-                            }
-                        }
-                        if (taresEsteDia === true) {
-                            diasDelMes.push({ id: ID, number: fecha.getDate(), diaSemana, fecha, ThisMount: false, Today: false, requestTask: true, Tasks: DaysTask });
-                        } else {
-                            diasDelMes.push({ id: ID, number: fecha.getDate(), diaSemana, fecha, ThisMount: false, Today: false, requestTask: false });
-                        }
-                        ID = ID + 1
-                        taresEsteDia = false
-
-                    }
-                }
-            }
-            const numPosterior = 42 - diasDelMes.length //  se obtiene el numero de dias que se necesita para rellenar el calendario
-
-            obtenerDiasDelante(diasDelMes[diasDelMes.length - 1].fecha, numPosterior)
-
-
-
-            return diasDelMes;
-        }
-        const fechaActual = new Date(); // Obtener la fecha actual
-        const año = fechaActual.getFullYear(); // Obtener el año actual
-
-        function obtenerNombreMes(fecha) {
-            const opciones = { month: 'long' };
-            const nombreMes = fecha.toLocaleString('es-ES', opciones);
-
-            return nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1);
-        }
-
-        const mes = obtenerNombreMes(fechaActual);
-
-
-
-        return ({
-            data: { month: mes, year: año },
-            days: obtenerDiasDelMes(),
-        })
-    }
-
-    res.json(await Calendar())
-})
-
-
-
-router.post('/login', async function (req, res, next) {
-
-    const user = req.body.user
-    const password = req.body.password
-    const data = await db.GetLoginByUserAndPassword(user, password)
-
-    if (data !== undefined) {
-        if (data.ConfirmRegister != 1) {
-            res.json({
-                authentication: false,
-                errMsg: 'Email no confirmado, porfavor ingrese a su email y confirme su cuenta',
-            })
-        } else {
-
-            res.json({
-                authentication: true,
-                user: data.user,
-                email: data.email,
-                profilePicture: data.profilePicture
-            })
-        }
-
-    } else {
-        res.json({
-            authentication: false,
-            errMsg: 'No encontramos un usuario con esas credenciales'
-        })
-    }
-})
-
-
-router.post('/register', async function (req, res, next) {
-    const data = req.body.obj
-    console.log(data)
-    console.log(data.password)
-    const check = await db.checkExistence(data.user, data.email)
-
-    function generarCodigoAleatorio() {
-        var codigo = '';
-        var caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        for (var i = 0; i < 8; i++) {
-            codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
-        }
-        return codigo;
-    }
-
-    if (check[0] === undefined) {
-        let obj = {
-            user: data.user,
-            password: md5(data.password),
-            email: data.email,
-            ConfirmRegister: 0,
-            token: generarCodigoAleatorio(),
-            PrevToken: generarCodigoAleatorio(),
-        }
-        let response = await db.InsertUser(obj)
-        var readHTMLFile = function (path, callback) {
-            fs.readFile(path, { encoding: 'utf-8' }, function (err, html) {
-                if (err) {
-                    callback(err);
-                }
-                else {
-                    callback(null, html);
-                }
-            });
-        };
-
-
-
-        readHTMLFile(__dirname + '/../views/templeteRegister.html', async function (err, html) {
-            if (err) {
-                console.log('error reading file', err);
-                return;
-            }
-            var template = handlebars.compile(html);
-            var replacements = {
-                Link: ` https://api.mindfulmind.com.ar/user/registerConfirmation/${data.user}/${data.email}`
-            };
-            var htmlToSend = template(replacements);
-            var mailOptions = {
-                from: 'mindfulmindsuport@gmail.com',
-                to: data.email,
-                subject: "Creaste tu cuenta en mindfulmind",
-                html: htmlToSend
-            };
-            transporter.sendMail(mailOptions, function (error, response) {
-                console.log(response.messageId)
-                if (error) {
-                    console.log(error);
-                }
-            });
-        });
-
-        res.json({ response, userCreate: true })
-    } else {
-        let ErrorResponse = { error: { email: false, user: false }, userCreate: false }
-        if (check[0].user == data.user) {
-            ErrorResponse.error.user = true
-        }
-        if (check[0].email == data.email) {
-            ErrorResponse.error.email = true
-        }
-        res.json(ErrorResponse)
-    }
-
-})
-
+// MAIN QUERY ------------------------------------------------------------
 
 router.post('/mainDataInitial', async function (req, res, next) {
     const RequestData = req.body.obj
@@ -582,7 +188,190 @@ router.post('/mainDataInitial', async function (req, res, next) {
     })
 })
 
+// MAIN QUERY ------------------------------------------------------------
 
+
+
+// SINGLES QUERYS------------------------------------------------------------
+
+router.get('/task/:users', async function (req, res, next) {
+    const user = req.params.users
+    const data = await db.GetTaskByUsers(user)
+    let taskComplete = 0
+    for (let i = 0; i < data.length; i++) {
+        const element = data[i];
+        if (element.completed === 1) {
+            taskComplete = taskComplete + 1
+        }
+    }
+    let porcentaje = (taskComplete / data.length * 100).toFixed(0) + '%'
+    const obj = {
+        data,
+        porcentaje: porcentaje
+    }
+    res.json(obj)
+})
+
+router.get('/text/:users', async function (req, res, next) {
+    const user = req.params.users
+    const data = await db.GetTextByUsers(user)
+    res.json(data)
+})
+
+router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
+
+    async function Calendar() {
+        const user = req.params.user
+        const idCalendar = req.params.idCalendar
+        const calendarTasks = await db.getCalendarTaskByUser(user, idCalendar)
+        function obtenerDiasDelMes() {
+            let ID = 1
+            const fechaActual = new Date(); // Obtener la fecha actual
+            const año = fechaActual.getFullYear(); // Obtener el año actual
+            const mes = fechaActual.getMonth(); // Obtener el mes actual (0-11)
+
+            const primerDia = new Date(año, mes, 1); // Crear una fecha con el primer día del mes
+            const ultimoDia = new Date(año, mes + 1, 0); // Crear una fecha con el último día del mes
+
+            const diasDelMes = [];
+
+            // Recorrer desde el primer día hasta el último día del mes
+            for (let i = primerDia.getDate(); i <= ultimoDia.getDate(); i++) {
+                const DaysTask = []
+                let taresEsteDia = false
+                const fecha = new Date(año, mes, i); // Crear una fecha con el día actual
+                const diaSemana = fecha.toLocaleDateString('es-ES', { weekday: 'long' }); // Obtener el día de la semana como una cadena de texto
+                for (let index = 0; index < calendarTasks.length; index++) {
+                    const element = calendarTasks[index];
+
+                    taksDate = new Date(element.date)
+                    if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
+                        taresEsteDia = true
+                        DaysTask.push(element)
+                    }
+                }
+                if (fecha.getDate() == fechaActual.getDate()) {
+                    if (taresEsteDia === true) {
+                        diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: true, requestTask: true, Tasks: DaysTask });
+                    } else {
+                        diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: true, requestTask: false });
+                    }
+                } else {
+                    if (taresEsteDia === true) {
+                        diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: false, requestTask: true, Tasks: DaysTask });
+                    } else {
+                        diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: false, requestTask: false });
+                    }
+                }
+                taresEsteDia = false
+                ID = ID + 1
+            }
+
+            const diasDeLaSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado']
+            let numAnterior = 0
+
+
+            for (let i = 0; i < diasDeLaSemana.length; i++) {
+                const element = diasDeLaSemana[i];
+                if (diasDelMes[0].diaSemana === element) {
+                    numAnterior = i
+                }
+            }
+
+            function obtenerDiasAtras(NewFecha, cantidadDias) {
+                if (cantidadDias != 0) {
+                    for (let i = 1; i < cantidadDias + 1; i++) {
+                        let taresEsteDia = false
+                        let DaysTask = []
+                        const fecha = new Date(NewFecha); // Crear una nueva instancia de Date con la fecha dada
+                        fecha.setDate(fecha.getDate() - i); // Restar "i" días a la fecha dada
+                        const diaSemana = fecha.toLocaleDateString('es-ES', { weekday: 'long' });
+                        for (let index = 0; index < calendarTasks.length; index++) {
+                            const element = calendarTasks[index];
+                            taksDate = new Date(calendarTasks[index].date)
+                            if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
+                                taresEsteDia = true
+                                DaysTask.push(element)
+
+                            }
+                        }
+                        if (taresEsteDia === true) {
+                            diasDelMes.unshift({ id: ID, number: fecha.getDate(), diaSemana, fecha, ThisMount: false, Today: false, requestTask: true, Tasks: DaysTask });
+                        } else {
+                            diasDelMes.unshift({ id: ID, number: fecha.getDate(), diaSemana, fecha, ThisMount: false, Today: false, requestTask: false });
+                        }
+                        ID = ID + 1
+                        taresEsteDia = false
+
+                    }
+                }
+            }
+            obtenerDiasAtras(diasDelMes[0].fecha, numAnterior)
+
+            function obtenerDiasDelante(NewFecha, cantidadDias) {
+                if (cantidadDias != 0) {
+                    for (let i = 1; i < cantidadDias + 1; i++) {
+                        let taresEsteDia = false
+                        let DaysTask = []
+                        const fecha = new Date(NewFecha); // Crear una nueva instancia de Date con la fecha dada
+                        fecha.setDate(fecha.getDate() + i); // Restar "i" días a la fecha dada
+                        const diaSemana = fecha.toLocaleDateString('es-ES', { weekday: 'long' });
+                        for (let index = 0; index < calendarTasks.length; index++) {
+                            const element = calendarTasks[index];
+                            taksDate = new Date(calendarTasks[index].date)
+                            if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
+                                taresEsteDia = true
+                                DaysTask.push(element)
+                            }
+                        }
+                        if (taresEsteDia === true) {
+                            diasDelMes.push({ id: ID, number: fecha.getDate(), diaSemana, fecha, ThisMount: false, Today: false, requestTask: true, Tasks: DaysTask });
+                        } else {
+                            diasDelMes.push({ id: ID, number: fecha.getDate(), diaSemana, fecha, ThisMount: false, Today: false, requestTask: false });
+                        }
+                        ID = ID + 1
+                        taresEsteDia = false
+
+                    }
+                }
+            }
+            const numPosterior = 42 - diasDelMes.length //  se obtiene el numero de dias que se necesita para rellenar el calendario
+
+            obtenerDiasDelante(diasDelMes[diasDelMes.length - 1].fecha, numPosterior)
+
+
+
+            return diasDelMes;
+        }
+        const fechaActual = new Date(); // Obtener la fecha actual
+        const año = fechaActual.getFullYear(); // Obtener el año actual
+
+        function obtenerNombreMes(fecha) {
+            const opciones = { month: 'long' };
+            const nombreMes = fecha.toLocaleString('es-ES', opciones);
+
+            return nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1);
+        }
+
+        const mes = obtenerNombreMes(fechaActual);
+
+
+
+        return ({
+            data: { month: mes, year: año },
+            days: obtenerDiasDelMes(),
+        })
+    }
+
+    res.json(await Calendar())
+})
+
+// SINGLES QUERYS------------------------------------------------------------
+
+
+
+
+// CRUD CALENDAR ------------------------------------------------------------
 
 router.post('/AddCalendarTask', async function (req, res, next) {
     const obj = req.body
@@ -793,13 +582,189 @@ router.post('/AddCalendarTask', async function (req, res, next) {
     res.json(newdata)
 })
 
+// CRUD CALENDAR ------------------------------------------------------------
+
+
+
+// CRUD TEXT ------------------------------------------------------------
+
+router.post('/createtext', async function (req, res, next) {
+    const data = req.body.data
+
+    try {
+        const insert = await db.createText(data)
+        const response = await db.GetTextByUsers(data.user)
+        data.id = insert.insertId
+        res.json({
+            data,
+            response
+        })
+    } catch (error) {
+        res.json({
+            err: error
+        })
+    }
+})
+
+router.post('/updatetext', async function (req, res, next) {
+    const data = req.body.data
+    const id = req.body.id
+    try {
+        await db.UpdateText(data, id)
+        const response = await db.GetTextByUsers(data.user)
+        data.id = id
+        res.json({
+            data,
+            response
+        })
+    } catch (error) {
+        res.json({
+            err: error
+        })
+    }
+
+
+})
+
+
+router.post('/deleteText', async function (req, res, next) {
+    const data = req.body.data
+    await db.deleteText(data.user, data.id)
+    res.json({
+        data
+    })
+})
+
+// CRUD TEXT ------------------------------------------------------------
+
+
+
+// CRUD ROUTINE ------------------------------------------------------------
+
+router.post('/newtask/:token', async function (req, res, next) {
+    const timeStamp = new Date().getTime()
+    const Data = req.body
+    console.log(Data.user)
+    const OrderNumber = await db.GetLastNumberOrder(Data.user)
+    console.log(OrderNumber)
+    const newTask = {
+        user: Data.user,
+        tasksName: Data.title,
+        completed: 0,
+        updateDate: timeStamp,
+        Orden: OrderNumber === undefined ? 1 : parseInt(OrderNumber) + 1
+    }
+    const Response = await db.InsertNewTask(newTask)
+    newTask.id = Response.insertId
+    res.json(newTask)
+});
+
+router.post('/ReOrder', async function (req, res, next) {
+    const obj = req.body.obj
+    const user = obj.info.user
+    console.log(obj.data)
+    const query = ['UPDATE tasks SET Orden = CASE id']
+    for (let i = 0; i < obj.data.length; i++) {
+        const element = obj.data[i];
+        query.push(`WHEN ${element.id} THEN ${element.NewOrden}`)
+    }
+    query.push(`END WHERE USER = "${user}"`)
+    const response = await db.ReOrderTasks(query.join(' '))
+    async function Tasks() {
+
+        const data = await db.GetTaskByUsers(user)
+        let taskComplete = 0
+        for (let i = 0; i < data.length; i++) {
+            const element = data[i];
+            if (element.completed === 1) {
+                taskComplete = taskComplete + 1
+            }
+        }
+        let porcentaje = (taskComplete / data.length * 100).toFixed(0) + '%'
+        const obj = {
+            data,
+            porcentaje: porcentaje
+        }
+        return (obj)
+    }
+    res.json(await Tasks())
+})
+
+router.delete('/DeleteTasks', async function (req, res, next) {
+
+    const data = req.body
+    console.log(data)
+    await db.DeleteTasks(data.user, data.id)
+
+    console.log(data.user)
+    async function Tasks() {
+
+        const response = await db.GetTaskByUsers(data.user)
+        let taskComplete = 0
+        for (let i = 0; i < response.length; i++) {
+            const element = response[i];
+            if (element.completed === 1) {
+                taskComplete = taskComplete + 1
+            }
+        }
+        let porcentaje = (taskComplete / response.length * 100).toFixed(0) + '%'
+        const obj = {
+            data: response,
+            porcentaje: porcentaje
+        }
+        return (obj)
+    }
+    res.json(await Tasks())
+})
+
+router.post('/completeTask', async function (req, res, next) {
+    const timeStamp = new Date().getTime()
+    const dataReq = JSON.parse(req.body.obj)
+    const response = await db.GetTaskForCheck(dataReq.user, dataReq.id)
+    if (response[0].completed === 0) {
+        const obj = { id: dataReq.id, user: dataReq.user, tasksName: dataReq.tasksName, completed: 1, updateDate: timeStamp }
+        const alterRows = await db.updateStateTask(obj, dataReq.user, dataReq.id)
+        const data = await db.GetTaskByUsers(dataReq.user)
+
+        let taskComplete = 0
+        for (let i = 0; i < data.length; i++) {
+            const element = data[i];
+            if (element.completed === 1) {
+                taskComplete = taskComplete + 1
+            }
+        }
+        let porcentaje = (taskComplete / data.length * 100).toFixed(0) + '%'
+        res.json({ work: true, change: 0, data, porcentaje })
+    } else {
+        const obj = { id: dataReq.id, user: dataReq.user, tasksName: dataReq.tasksName, completed: 0, updateDate: timeStamp }
+        const alterRows = await db.updateStateTask(obj, dataReq.user, dataReq.id)
+
+        const data = await db.GetTaskByUsers(dataReq.user)
+        let taskComplete = 0
+        for (let i = 0; i < data.length; i++) {
+            const element = data[i];
+            if (element.completed === 1) {
+                taskComplete = taskComplete + 1
+            }
+        }
+        let porcentaje = (taskComplete / data.length * 100).toFixed(0) + '%'
+        res.json({ work: true, change: 1, data, porcentaje })
+    }
+})
+
+// CRUD ROUTINE ------------------------------------------------------------
+
+
+
+
+
+// END POINT CALLED BY BACKEND --------------------------------------
+
 router.get('/FinishFuntion', async function (req, res, next) {
     db.FinishFuntion()
     console.log('si?')
     res.json({ request: true })
 })
-
-
 
 router.post('/SendNotification', async function (req, res, next) {
     const somePushTokens = req.body
@@ -917,6 +882,124 @@ router.post('/SendNotification', async function (req, res, next) {
     res.json(tickets)
 })
 
+// END POINT CALLED BY BACKEND --------------------------------------
+
+
+
+
+// lOGIN AND REGISTER SIMPLE --------------------------------------
+
+router.post('/login', async function (req, res, next) {
+
+    const user = req.body.user
+    const password = req.body.password
+    const data = await db.GetLoginByUserAndPassword(user, password)
+
+    if (data !== undefined) {
+        if (data.ConfirmRegister != 1) {
+            res.json({
+                authentication: false,
+                errMsg: 'Email no confirmado, porfavor ingrese a su email y confirme su cuenta',
+            })
+        } else {
+
+            res.json({
+                authentication: true,
+                user: data.user,
+                email: data.email,
+                profilePicture: data.profilePicture
+            })
+        }
+
+    } else {
+        res.json({
+            authentication: false,
+            errMsg: 'No encontramos un usuario con esas credenciales'
+        })
+    }
+})
+
+router.post('/register', async function (req, res, next) {
+    const data = req.body.obj
+    console.log(data)
+    console.log(data.password)
+    const check = await db.checkExistence(data.user, data.email)
+
+    function generarCodigoAleatorio() {
+        var codigo = '';
+        var caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        for (var i = 0; i < 8; i++) {
+            codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+        }
+        return codigo;
+    }
+
+    if (check[0] === undefined) {
+        let obj = {
+            user: data.user,
+            password: md5(data.password),
+            email: data.email,
+            ConfirmRegister: 0,
+            token: generarCodigoAleatorio(),
+            PrevToken: generarCodigoAleatorio(),
+        }
+        let response = await db.InsertUser(obj)
+        var readHTMLFile = function (path, callback) {
+            fs.readFile(path, { encoding: 'utf-8' }, function (err, html) {
+                if (err) {
+                    callback(err);
+                }
+                else {
+                    callback(null, html);
+                }
+            });
+        };
+
+
+
+        readHTMLFile(__dirname + '/../views/templeteRegister.html', async function (err, html) {
+            if (err) {
+                console.log('error reading file', err);
+                return;
+            }
+            var template = handlebars.compile(html);
+            var replacements = {
+                Link: ` https://api.mindfulmind.com.ar/user/registerConfirmation/${data.user}/${data.email}`
+            };
+            var htmlToSend = template(replacements);
+            var mailOptions = {
+                from: 'mindfulmindsuport@gmail.com',
+                to: data.email,
+                subject: "Creaste tu cuenta en mindfulmind",
+                html: htmlToSend
+            };
+            transporter.sendMail(mailOptions, function (error, response) {
+                console.log(response.messageId)
+                if (error) {
+                    console.log(error);
+                }
+            });
+        });
+
+        res.json({ response, userCreate: true })
+    } else {
+        let ErrorResponse = { error: { email: false, user: false }, userCreate: false }
+        if (check[0].user == data.user) {
+            ErrorResponse.error.user = true
+        }
+        if (check[0].email == data.email) {
+            ErrorResponse.error.email = true
+        }
+        res.json(ErrorResponse)
+    }
+
+})
+
+// lOGIN AND REGISTER SIMPLE --------------------------------------
+
+
+
+// Forgot password from register --------------------------------------
 
 router.post('/Authcod/forgetpassword', async function (req, res, next) {
 
@@ -1043,7 +1126,12 @@ router.post('/ChangePassword', async function (req, res, next) {
 
 
 })
+// Forgot password from register --------------------------------------
 
+
+
+
+// USER SETTING ENDPOINTS --------------------------------------
 
 router.post('/changePasswordWithPass', async function (req, res, next) {
     const data = req.body.data
@@ -1109,54 +1197,11 @@ router.post('/changeUsername', async function (req, res, next) {
 
 
 })
+// USER SETTING ENDPOINTS --------------------------------------
 
 
-router.post('/createtext', async function (req, res, next) {
-    const data = req.body.data
-
-    try {
-        const insert = await db.createText(data)
-        const response = await db.GetTextByUsers(data.user)
-        data.id = insert.insertId
-        res.json({
-            data,
-            response
-        })
-    } catch (error) {
-        res.json({
-            err: error
-        })
-    }
-})
-
-router.post('/updatetext', async function (req, res, next) {
-    const data = req.body.data
-    const id = req.body.id
-    try {
-        await db.UpdateText(data, id)
-        const response = await db.GetTextByUsers(data.user)
-        data.id = id
-        res.json({
-            data,
-            response
-        })
-    } catch (error) {
-        res.json({
-            err: error
-        })
-    }
 
 
-})
-
-
-router.post('/deleteText', async function (req, res, next) {
-    const data = req.body.data
-    await db.deleteText(data.user, data.id)
-    res.json({
-        data
-    })
-})
 
 
 module.exports = router;
