@@ -907,7 +907,8 @@ router.post('/login', async function (req, res, next) {
                 authentication: true,
                 user: data.user,
                 email: data.email,
-                profilePicture: data.profilePicture
+                profilePicture: data.profilePicture,
+                tutorial: data.tutorial
             })
         }
 
