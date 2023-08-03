@@ -11,7 +11,13 @@ require('dotenv').config()
 
 var indexRouter = require('./routes/index');
 var registerConfirmation = require('./routes/registerConfimation')
-
+var Login = require('./routes/Login')
+var CRUDCalendar = require('./routes/CRUDCalendar')
+var CRUDText = require('./routes/CRUDText')
+var CRUDRoutine = require('./routes/CRUDRoutine')
+var getData = require('./routes/getData')
+var ForgetPassword = require('./routes/ForgetPassword')
+var UserSetting = require('./routes/UserSetting')
 
 var app = express();
 
@@ -29,7 +35,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', cors(), indexRouter);
 app.use('/user', cors(), registerConfirmation)
-
+app.use('/login', cors(), Login)
+app.use('/Calendar', cors(), CRUDCalendar)
+app.use('/Text', cors(), CRUDText)
+app.use('/Routine', cors(), CRUDRoutine)
+app.use('/getData', cors(), getData)
+app.use('/ForgetPassword', cors(), ForgetPassword)
+app.use('/UserSetting', cors(), UserSetting)
 
 
 // catch 404 and forward to error handler
