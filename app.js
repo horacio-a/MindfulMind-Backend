@@ -63,18 +63,33 @@ app.use(function (err, req, res, next) {
 
 var axios = require('axios');
 const schedule = require('node-schedule');
+const transporter = require('./nodeMailer/mailerconfig')
 
 
-schedule.scheduleJob('0 0 * * *', function () {
-  axios.get('http://localhost:3500/FinishFuntion')
-  console.log('Finish')
-});
+const restartRoutineJob = schedule.scheduleJob('0 0 * * *', async function () {
+  const response = await axios.get('http://localhost:3500/restartRoutine')
+  if (response.data.request === false) {
+    var mailOptions = {
+      from: 'mindfulmindsuport@gmail.com',
+      to: process.env.MyEmail,
+      subject: "Error en el restartRoutine",
+      html: htmlToSend
+    };
+    transporter.sendMail(mailOptions, function (error, response) {
+      console.log(response.messageId)
+      if (error) {
+        console.log(error);
+      }
+    });
+  }
+})
 
-schedule.scheduleJob('* * * * *', function () {
-  // const date = new Date()
-  // const timeStamp = date.getTime()
-  // console.log('This job actually ran at ' + date);
-  // console.log('entre ', timeStamp, ' y ', timeStamp + 60000)
-});
+var port = (process.env.PORT || '3000');
 
-module.exports = app;
+
+const server = app.listen(port, () => {
+  console.log(`server run on port ${port}`)
+})
+
+
+module.exports = { app, server, restartRoutineJob };
