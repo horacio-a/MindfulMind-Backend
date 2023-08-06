@@ -6,14 +6,11 @@ const transporter = nodemailer.createTransport({
     port: 465,
     secure: true,
     auth: {
-        // TODO: replace `user` and `pass` values from <https://forwardemail.net>
         user: 'mindfulmindsuport@gmail.com',
         pass: process.env.googlePassword
     }
 });
 
-transporter.verify().then(() => {
-    console.log('ready to send emails')
-})
+
 
 module.exports = transporter
