@@ -1,23 +1,27 @@
-const { server, restartRoutineJob } = require('../app')
-const pool = require('../models/db')
-const CloseAllServis = require('./helpers/global.helper')
-const {
-    request,
-    dataForSimpleNotification,
-    dataForMultipleNotification,
-    RestartRoutine
-} = require('./helpers/CRUDcalendar.helper')
+const { CloseAllServis, request, } = require('./helpers/global.helper')
+// const {
+// } = require('./helpers/CRUDcalendar.helper')
 
 
-beforeAll(async () => {
-    await RestartRoutine()
+// beforeAll(async () => {
+// });
+
+
+describe('Calenadar', () => {
+
+    test('Empty body for create text ', async () => {
+        const response = await request.post('/text/createtext')
+        expect(response.status).toBe(400);
+        expect(response.body.err).toBe(true);
+        expect(response.body.errMsg).toBe('Empty body');
+
+    });
+
+
 });
-
-
 
 
 
 afterAll(() => {
     CloseAllServis()
-
 });

@@ -90,7 +90,6 @@ async function RestartRoutine() {
 
 
 module.exports = {
-    request,
     dataForSimpleNotification,
     dataForMultipleNotification,
     RestartRoutine

@@ -53,6 +53,6 @@ describe('RestartRoutine', () => {
 
 
 afterAll(() => {
-    CloseAllServis
+    CloseAllServis()
 
 });

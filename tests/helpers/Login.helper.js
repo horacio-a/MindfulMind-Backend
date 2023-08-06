@@ -43,7 +43,6 @@ async function restartDB() {
 
 
 module.exports = {
-    request,
     restartDB,
     exampleUserConfirmed,
     exampleUser
