@@ -9,48 +9,75 @@ var db = require('../models/dbInteraction')
 
 router.post('/createtext', async function (req, res, next) {
     const data = req.body.data
-    try {
-        const insert = await db.createText(data)
-        const response = await db.GetTextByUsers(data.user)
-        data.id = insert.insertId
-        res.json({
-            data,
-            response
+    console.log(data)
+    if (data !== undefined) {
+        try {
+            const insert = await db.createText(data)
+            const response = await db.GetTextByUsers(data.user)
+            data.id = insert.insertId
+            res.status(200).json({
+                data,
+                response
+            })
+        } catch (error) {
+            res.status(400).json({
+                err: true,
+            })
+        }
+    } else {
+        res.status(400).json({
+            err: true,
+            errMsg: 'Empty body'
         })
-    } catch (error) {
-        res.json({
-            err: error
-        })
+
     }
+
 })
 
 router.post('/updatetext', async function (req, res, next) {
     const data = req.body.data
     const id = req.body.id
-    try {
-        await db.UpdateText(data, id)
-        const response = await db.GetTextByUsers(data.user)
-        data.id = id
-        res.json({
-            data,
-            response
+    if (data !== undefined && id !== undefined) {
+        try {
+            await db.UpdateText(data, id)
+            const response = await db.GetTextByUsers(data.user)
+            data.id = id
+            res.status(200).json({
+                data,
+                response
+            })
+        } catch (error) {
+            res.status(400).json({
+                err: error
+            })
+        }
+    } else {
+        res.status(400).json({
+            err: true,
+            errMsg: 'Empty body'
         })
-    } catch (error) {
-        res.json({
-            err: error
-        })
-    }
 
+    }
 
 })
 
 
 router.post('/deleteText', async function (req, res, next) {
     const data = req.body.data
-    await db.deleteText(data.user, data.id)
-    res.json({
-        data
-    })
+    if (data !== undefined) {
+        await db.deleteText(data.user, data.id)
+        res.json({
+            data
+        })
+    } else {
+        res.status(400).json({
+            err: true,
+            errMsg: 'Empty body'
+        })
+
+    }
+
+
 })
 
 // CRUD TEXT ------------------------------------------------------------
