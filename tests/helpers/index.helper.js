@@ -1,7 +1,5 @@
 
-const { app } = require('../../app')
-const supertest = require('supertest')
-const request = supertest(app)
+
 const db = require('../../models/dbInteraction')
 const date = new Date()
 

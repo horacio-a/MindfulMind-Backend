@@ -1,7 +1,7 @@
 const { server, restartRoutineJob } = require('../app')
 const pool = require('../models/db')
-const { request, restartDB, exampleUserConfirmed, exampleUser } = require('./helpers/Login.helper')
-const CloseAllServis = require('./helpers/global.helper')
+const { restartDB, exampleUserConfirmed, exampleUser } = require('./helpers/Login.helper')
+const { CloseAllServis, request, } = require('./helpers/global.helper')
 
 beforeAll(async () => {
     // Con restartDB Borro todos los datos de la tabla user y inserta uno dato

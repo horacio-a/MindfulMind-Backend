@@ -1,12 +1,11 @@
 const { server, restartRoutineJob } = require('../app')
 const pool = require('../models/db')
-const CloseAllServis = require('./helpers/global.helper')
+const { CloseAllServis, request, } = require('./helpers/global.helper')
 const {
-    request,
     dataForSimpleNotification,
     dataForMultipleNotification,
     RestartRoutine
-} = require('./helpers/CRUDcalendar.helper')
+} = require('./helpers/CRUDText.helper')
 
 
 beforeAll(async () => {
