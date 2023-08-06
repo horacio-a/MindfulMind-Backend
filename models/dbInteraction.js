@@ -317,6 +317,17 @@ async function DeleteAllRoutine() {
 }
 
 
+async function RestartText() {
+    try {
+        let query = `DELETE FROM usertexts`
+        let rows = await pool.query(query)
+        return rows
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
 
 // QUERYS FOR TESTING --------------------------------------
 
@@ -328,5 +339,5 @@ module.exports = {
     GetLastNumberOrder, ReOrderTasks, DeleteTasks, InsertCalendarTaskWithQuery,
     UpdateTokenForUser, checkAuthcode, changePassword, CheckPreviousPasswordChange,
     ConfirmRegister, ChangeProfilePicture, ChangeAllUsername, createText, UpdateText,
-    deleteText, updateCalendatTasks, RestartUsers, DeleteAllRoutine
+    deleteText, updateCalendatTasks, RestartUsers, DeleteAllRoutine, RestartText
 }
