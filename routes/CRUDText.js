@@ -1,16 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var axios = require('axios');
 var db = require('../models/dbInteraction')
-var md5 = require('md5');
-const { Expo } = require('expo-server-sdk')
-const nodemailer = require("nodemailer");
-const transporter = require('../nodeMailer/mailerconfig')
-var fs = require('fs');
-var handlebars = require('handlebars');
-const { token } = require('morgan');
-
-
 
 
 
@@ -19,7 +9,6 @@ const { token } = require('morgan');
 
 router.post('/createtext', async function (req, res, next) {
     const data = req.body.data
-
     try {
         const insert = await db.createText(data)
         const response = await db.GetTextByUsers(data.user)
