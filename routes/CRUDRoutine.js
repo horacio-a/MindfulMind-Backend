@@ -9,50 +9,64 @@ var db = require('../models/dbInteraction')
 router.post('/newtask', async function (req, res, next) {
     const timeStamp = new Date().getTime()
     const Data = req.body
-    console.log(Data.user)
-    const OrderNumber = await db.GetLastNumberOrder(Data.user)
-    console.log(OrderNumber)
-    const newTask = {
-        user: Data.user,
-        tasksName: Data.title,
-        completed: 0,
-        updateDate: timeStamp,
-        Orden: OrderNumber === undefined ? 1 : parseInt(OrderNumber) + 1
+    console.log(Data)
+    if (Data.user !== undefined && Data.title !== undefined) {
+        const OrderNumber = await db.GetLastNumberOrder(Data.user)
+        const newTask = {
+            user: Data.user,
+            tasksName: Data.title,
+            completed: 0,
+            updateDate: timeStamp,
+            Orden: OrderNumber === undefined ? 1 : parseInt(OrderNumber) + 1
+        }
+        const Response = await db.InsertNewTask(newTask)
+        newTask.id = Response.insertId
+        res.json(newTask)
+    } else {
+        res.status(400).json({
+            err: true,
+            errMsg: 'Empty body'
+        })
     }
-    const Response = await db.InsertNewTask(newTask)
-    newTask.id = Response.insertId
-    res.json(newTask)
+
 });
 
 router.post('/ReOrder', async function (req, res, next) {
     const obj = req.body.obj
-    const user = obj.info.user
-    console.log(obj.data)
-    const query = ['UPDATE tasks SET Orden = CASE id']
-    for (let i = 0; i < obj.data.length; i++) {
-        const element = obj.data[i];
-        query.push(`WHEN ${element.id} THEN ${element.NewOrden}`)
-    }
-    query.push(`END WHERE USER = "${user}"`)
-    const response = await db.ReOrderTasks(query.join(' '))
-    async function Tasks() {
+    if (obj !== undefined) {
+        const user = obj.info.user
+        const query = ['UPDATE tasks SET Orden = CASE id']
+        for (let i = 0; i < obj.data.length; i++) {
+            const element = obj.data[i];
+            query.push(`WHEN ${element.id} THEN ${element.NewOrden}`)
+        }
+        query.push(`END WHERE USER = "${user}"`)
+        const response = await db.ReOrderTasks(query.join(' '))
+        async function Tasks() {
 
-        const data = await db.GetTaskByUsers(user)
-        let taskComplete = 0
-        for (let i = 0; i < data.length; i++) {
-            const element = data[i];
-            if (element.completed === 1) {
-                taskComplete = taskComplete + 1
+            const data = await db.GetTaskByUsers(user)
+            let taskComplete = 0
+            for (let i = 0; i < data.length; i++) {
+                const element = data[i];
+                if (element.completed === 1) {
+                    taskComplete = taskComplete + 1
+                }
             }
+            let porcentaje = (taskComplete / data.length * 100).toFixed(0) + '%'
+            const obj = {
+                data,
+                porcentaje: porcentaje
+            }
+            return (obj)
         }
-        let porcentaje = (taskComplete / data.length * 100).toFixed(0) + '%'
-        const obj = {
-            data,
-            porcentaje: porcentaje
-        }
-        return (obj)
+        res.json(await Tasks())
+    } else {
+        res.status(400).json({
+            err: true,
+            errMsg: 'Empty body'
+        })
     }
-    res.json(await Tasks())
+
 })
 
 router.delete('/DeleteTasks', async function (req, res, next) {
