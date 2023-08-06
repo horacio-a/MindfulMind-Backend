@@ -1,5 +1,5 @@
 const { route } = require('../routes')
-var pool = require('./db')
+var pool = require('../models/db')
 var md5 = require('md5');
 
 
@@ -81,7 +81,7 @@ async function GetTextByUsers(user) {
 async function GetLoginByUserAndPassword(user, password) {
     try {
         var query = 'select * from users WHERE user = ? and password = ?'
-        var rows = await pool.query(query, [user, md5(password)])
+        var rows = await pool.query(query, [user, password])
         return rows[0]
     } catch (error) {
         console.log(error)
@@ -123,14 +123,13 @@ async function getCalendarTaskByUser(user, idCalendar) {
 
 
 
-async function FinishFuntion() {
+async function restartRoutine() {
     try {
         var query = 'UPDATE tasks SET completed = 0'
         var rows = pool.query(query)
         return rows
     } catch (error) {
         console.log(error)
-
     }
 }
 
@@ -281,14 +280,53 @@ async function deleteText(user, id) {
     }
 }
 
+async function updateCalendatTasks(data, id) {
+    try {
+        let query = `UPDATE usertexts SET ? WHERE id = ${id}`
+        let rows = await pool.query(query, [data])
+        return rows
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
+// QUERYS FOR TESTING --------------------------------------
+
+async function RestartUsers() {
+    try {
+        let query = `DELETE FROM users`
+        let rows = await pool.query(query)
+        return rows
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
+
+async function DeleteAllRoutine() {
+    try {
+        let query = `DELETE FROM tasks`
+        let rows = await pool.query(query)
+        return rows
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
+
+
+// QUERYS FOR TESTING --------------------------------------
 
 
 module.exports = {
     GetTextByUsers, getCalendarTaskByUser, InsertUser, InsertNewTask,
     GetTaskByUsers, GetLoginByUserAndPassword, checkExistence,
-    GetTaskForCheck, updateStateTask, FinishFuntion, InsertCalendarTask,
+    GetTaskForCheck, updateStateTask, restartRoutine, InsertCalendarTask,
     GetLastNumberOrder, ReOrderTasks, DeleteTasks, InsertCalendarTaskWithQuery,
     UpdateTokenForUser, checkAuthcode, changePassword, CheckPreviousPasswordChange,
     ConfirmRegister, ChangeProfilePicture, ChangeAllUsername, createText, UpdateText,
-    deleteText
+    deleteText, updateCalendatTasks, RestartUsers, DeleteAllRoutine
 }
