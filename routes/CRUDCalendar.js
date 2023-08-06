@@ -1,14 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var axios = require('axios');
 var db = require('../models/dbInteraction')
-var md5 = require('md5');
-const { Expo } = require('expo-server-sdk')
-const nodemailer = require("nodemailer");
-const transporter = require('../nodeMailer/mailerconfig')
-var fs = require('fs');
-var handlebars = require('handlebars');
-const { token } = require('morgan');
 
 
 
@@ -222,6 +214,12 @@ router.post('/AddCalendarTask', async function (req, res, next) {
     db.InsertCalendarTaskWithQuery(createQuery(newdata))
 
     res.json(newdata)
+})
+
+
+router.post('/updateCalendatTasks', async function (req, res, next) {
+    const data = req.body.data
+
 })
 
 // CRUD CALENDAR ------------------------------------------------------------
