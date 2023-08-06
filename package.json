@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_ENV=devolopment nodemon ./app",
-    "strart": "cross-env NODE_ENV=production node ./app",
+    "start": "cross-env NODE_ENV=production node ./app",
     "test": "cross-env NODE_ENV=test jest  --forceExit  --maxWorkers=1 --silent  --detectOpenHandles --verbose"
   },
   "dependencies": {
