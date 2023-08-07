@@ -106,8 +106,10 @@ router.delete('/DeleteTasks', async function (req, res, next) {
 
 router.post('/completeTask', async function (req, res, next) {
     const timeStamp = new Date().getTime()
+    console.log(req.body.obj)
     if (req.body.obj !== undefined) {
-        const dataReq = JSON.parse(req.body.obj)
+        const dataReq = req.body.obj
+
         const response = await db.GetTaskForCheck(dataReq.user, dataReq.id)
         if (response[0].completed === 0) {
             const obj = { id: dataReq.id, user: dataReq.user, tasksName: dataReq.tasksName, completed: 1, updateDate: timeStamp }
@@ -135,16 +137,24 @@ router.post('/completeTask', async function (req, res, next) {
             const obj = { id: dataReq.id, user: dataReq.user, tasksName: dataReq.tasksName, completed: 0, updateDate: timeStamp }
             const alterRows = await db.updateStateTask(obj, dataReq.user, dataReq.id)
 
-            const data = await db.GetTaskByUsers(dataReq.user)
-            let taskComplete = 0
-            for (let i = 0; i < data.length; i++) {
-                const element = data[i];
-                if (element.completed === 1) {
-                    taskComplete = taskComplete + 1
+            async function Tasks() {
+
+                const response = await db.GetTaskByUsers(dataReq.user)
+                let taskComplete = 0
+                for (let i = 0; i < response.length; i++) {
+                    const element = response[i];
+                    if (element.completed === 1) {
+                        taskComplete = taskComplete + 1
+                    }
                 }
+                let porcentaje = (taskComplete / response.length * 100).toFixed(0) + '%'
+                const obj = {
+                    data: response,
+                    porcentaje: porcentaje
+                }
+                return (obj)
             }
-            let porcentaje = (taskComplete / data.length * 100).toFixed(0) + '%'
-            res.json({ work: true, change: 1, data, porcentaje })
+            res.status(200).json(await Tasks())
         }
     } else {
         res.status(400).json({
