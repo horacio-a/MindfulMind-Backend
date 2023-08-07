@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_ENV=devolopment nodemon ./app",
-    "start": "cross-env NODE_ENV=production node ./app",
-    "test": "cross-env NODE_ENV=test jest  --forceExit  --maxWorkers=1 --silent  --detectOpenHandles --verbose"
+    "start": "cross-env NODE_ENV=production nodemon ./app",
+    "test": "cross-env NODE_ENV=test jest  --forceExit  --maxWorkers=1   --detectOpenHandles --verbose"
   },
   "dependencies": {
     "axios": "^1.1.3",

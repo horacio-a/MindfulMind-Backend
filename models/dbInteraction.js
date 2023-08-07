@@ -306,14 +306,39 @@ async function RestartUsers() {
 
 
 async function DeleteAllRoutine() {
-    try {
-        let query = `DELETE FROM tasks`
-        let rows = await pool.query(query)
-        return rows
-    } catch (error) {
-        console.log(error)
+    if (process.env.NODE_ENV === 'test') {
+        console.log('se elimino la base de datos')
+        try {
+            let query = `TRUNCATE TABLE tasks`
+            let rows = await pool.query(query)
+            console.log(rows)
+            return rows
+        } catch (error) {
+            console.log(error)
 
+        }
+    } else {
+        return ('Error. este comando eliminaria la tabla de la bd')
     }
+
+}
+
+async function DeleteAllCalendar() {
+    if (process.env.NODE_ENV === 'test') {
+        console.log('se elimino la base de datos')
+        try {
+            let query = `TRUNCATE TABLE calendar`
+            let rows = await pool.query(query)
+            console.log(rows)
+            return rows
+        } catch (error) {
+            console.log(error)
+
+        }
+    } else {
+        return ('Error. este comando eliminaria la tabla de la bd')
+    }
+
 }
 
 
@@ -339,5 +364,5 @@ module.exports = {
     GetLastNumberOrder, ReOrderTasks, DeleteTasks, InsertCalendarTaskWithQuery,
     UpdateTokenForUser, checkAuthcode, changePassword, CheckPreviousPasswordChange,
     ConfirmRegister, ChangeProfilePicture, ChangeAllUsername, createText, UpdateText,
-    deleteText, updateCalendatTasks, RestartUsers, DeleteAllRoutine, RestartText
+    deleteText, updateCalendatTasks, RestartUsers, DeleteAllRoutine, RestartText, DeleteAllCalendar
 }
