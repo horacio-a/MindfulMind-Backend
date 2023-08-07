@@ -4,7 +4,7 @@ var db = require('../models/dbInteraction')
 
 // MAIN QUERY ------------------------------------------------------------
 
-router.post('/mainDataInitial', async function (req, res, next) {
+router.post('/all', async function (req, res, next) {
     const RequestData = req.body.obj
     console.log(RequestData)
     if (RequestData == undefined) {
