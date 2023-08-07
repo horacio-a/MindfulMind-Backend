@@ -280,9 +280,9 @@ async function deleteText(user, id) {
     }
 }
 
-async function updateCalendatTasks(data, id) {
+async function updateCalendarTasks(data, id) {
     try {
-        let query = `UPDATE usertexts SET ? WHERE id = ${id}`
+        let query = `UPDATE calendar SET ? WHERE id = ${id}`
         let rows = await pool.query(query, [data])
         return rows
     } catch (error) {
@@ -290,6 +290,14 @@ async function updateCalendatTasks(data, id) {
 
     }
 }
+
+
+
+
+
+
+
+
 
 // QUERYS FOR TESTING --------------------------------------
 
@@ -364,5 +372,5 @@ module.exports = {
     GetLastNumberOrder, ReOrderTasks, DeleteTasks, InsertCalendarTaskWithQuery,
     UpdateTokenForUser, checkAuthcode, changePassword, CheckPreviousPasswordChange,
     ConfirmRegister, ChangeProfilePicture, ChangeAllUsername, createText, UpdateText,
-    deleteText, updateCalendatTasks, RestartUsers, DeleteAllRoutine, RestartText, DeleteAllCalendar
+    deleteText, updateCalendarTasks, RestartUsers, DeleteAllRoutine, RestartText, DeleteAllCalendar
 }
