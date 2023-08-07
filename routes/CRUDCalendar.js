@@ -228,7 +228,17 @@ router.post('/create', async function (req, res, next) {
 
 router.post('/update', async function (req, res, next) {
     const data = req.body
-    console.log(data)
+
+    if (data !== undefined) {
+        const respose = await db.updateCalendarTasks(data.data, data.data.id)
+        res.status(200).json(respose)
+    } else {
+        res.status(400).json({
+            err: true,
+            errMsg: 'Empty body'
+        })
+    }
+
 })
 
 // CRUD CALENDAR ------------------------------------------------------------
