@@ -21,7 +21,7 @@ router.post('/newtask', async function (req, res, next) {
         }
         const Response = await db.InsertNewTask(newTask)
         newTask.id = Response.insertId
-        res.json(newTask)
+        res.status(200).json(newTask)
     } else {
         res.status(400).json({
             err: true,
@@ -41,9 +41,10 @@ router.post('/ReOrder', async function (req, res, next) {
             query.push(`WHEN ${element.id} THEN ${element.NewOrden}`)
         }
         query.push(`END WHERE USER = "${user}"`)
+        console.log(query.join(' '))
         const response = await db.ReOrderTasks(query.join(' '))
+        console.log(response)
         async function Tasks() {
-
             const data = await db.GetTaskByUsers(user)
             let taskComplete = 0
             for (let i = 0; i < data.length; i++) {
@@ -59,7 +60,7 @@ router.post('/ReOrder', async function (req, res, next) {
             }
             return (obj)
         }
-        res.json(await Tasks())
+        res.status(200).json(await Tasks())
     } else {
         res.status(400).json({
             err: true,
@@ -72,62 +73,84 @@ router.post('/ReOrder', async function (req, res, next) {
 router.delete('/DeleteTasks', async function (req, res, next) {
 
     const data = req.body
-    console.log(data)
-    await db.DeleteTasks(data.user, data.id)
 
-    console.log(data.user)
-    async function Tasks() {
 
-        const response = await db.GetTaskByUsers(data.user)
-        let taskComplete = 0
-        for (let i = 0; i < response.length; i++) {
-            const element = response[i];
-            if (element.completed === 1) {
-                taskComplete = taskComplete + 1
+    if (data.user !== undefined && data.id !== undefined) {
+        await db.DeleteTasks(data.user, data.id)
+        async function Tasks() {
+
+            const response = await db.GetTaskByUsers(data.user)
+            let taskComplete = 0
+            for (let i = 0; i < response.length; i++) {
+                const element = response[i];
+                if (element.completed === 1) {
+                    taskComplete = taskComplete + 1
+                }
             }
+            let porcentaje = (taskComplete / response.length * 100).toFixed(0) + '%'
+            const obj = {
+                data: response,
+                porcentaje: porcentaje
+            }
+            return (obj)
         }
-        let porcentaje = (taskComplete / response.length * 100).toFixed(0) + '%'
-        const obj = {
-            data: response,
-            porcentaje: porcentaje
-        }
-        return (obj)
+        res.status(200).json(await Tasks())
+    } else {
+        res.status(400).json({
+            err: true,
+            errMsg: 'Empty body'
+        })
     }
-    res.json(await Tasks())
+
 })
 
 router.post('/completeTask', async function (req, res, next) {
     const timeStamp = new Date().getTime()
-    const dataReq = JSON.parse(req.body.obj)
-    const response = await db.GetTaskForCheck(dataReq.user, dataReq.id)
-    if (response[0].completed === 0) {
-        const obj = { id: dataReq.id, user: dataReq.user, tasksName: dataReq.tasksName, completed: 1, updateDate: timeStamp }
-        const alterRows = await db.updateStateTask(obj, dataReq.user, dataReq.id)
-        const data = await db.GetTaskByUsers(dataReq.user)
+    if (req.body.obj !== undefined) {
+        const dataReq = JSON.parse(req.body.obj)
+        const response = await db.GetTaskForCheck(dataReq.user, dataReq.id)
+        if (response[0].completed === 0) {
+            const obj = { id: dataReq.id, user: dataReq.user, tasksName: dataReq.tasksName, completed: 1, updateDate: timeStamp }
+            const alterRows = await db.updateStateTask(obj, dataReq.user, dataReq.id)
+            async function Tasks() {
 
-        let taskComplete = 0
-        for (let i = 0; i < data.length; i++) {
-            const element = data[i];
-            if (element.completed === 1) {
-                taskComplete = taskComplete + 1
+                const response = await db.GetTaskByUsers(dataReq.user)
+                let taskComplete = 0
+                for (let i = 0; i < response.length; i++) {
+                    const element = response[i];
+                    if (element.completed === 1) {
+                        taskComplete = taskComplete + 1
+                    }
+                }
+                let porcentaje = (taskComplete / response.length * 100).toFixed(0) + '%'
+                const obj = {
+                    data: response,
+                    porcentaje: porcentaje
+                }
+                return (obj)
             }
+            res.status(200).json({ newdata: await Tasks(), work: true, change: 0, })
+
+        } else {
+            const obj = { id: dataReq.id, user: dataReq.user, tasksName: dataReq.tasksName, completed: 0, updateDate: timeStamp }
+            const alterRows = await db.updateStateTask(obj, dataReq.user, dataReq.id)
+
+            const data = await db.GetTaskByUsers(dataReq.user)
+            let taskComplete = 0
+            for (let i = 0; i < data.length; i++) {
+                const element = data[i];
+                if (element.completed === 1) {
+                    taskComplete = taskComplete + 1
+                }
+            }
+            let porcentaje = (taskComplete / data.length * 100).toFixed(0) + '%'
+            res.json({ work: true, change: 1, data, porcentaje })
         }
-        let porcentaje = (taskComplete / data.length * 100).toFixed(0) + '%'
-        res.json({ work: true, change: 0, data, porcentaje })
     } else {
-        const obj = { id: dataReq.id, user: dataReq.user, tasksName: dataReq.tasksName, completed: 0, updateDate: timeStamp }
-        const alterRows = await db.updateStateTask(obj, dataReq.user, dataReq.id)
-
-        const data = await db.GetTaskByUsers(dataReq.user)
-        let taskComplete = 0
-        for (let i = 0; i < data.length; i++) {
-            const element = data[i];
-            if (element.completed === 1) {
-                taskComplete = taskComplete + 1
-            }
-        }
-        let porcentaje = (taskComplete / data.length * 100).toFixed(0) + '%'
-        res.json({ work: true, change: 1, data, porcentaje })
+        res.status(400).json({
+            err: true,
+            errMsg: 'Empty body'
+        })
     }
 })
 
