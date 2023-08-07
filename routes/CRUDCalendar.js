@@ -230,6 +230,11 @@ router.post('/update', async function (req, res, next) {
     const data = req.body
 
     if (data !== undefined) {
+        if (!data.info.Allday) {
+            data.data.intialHour = data.data.intialHour.split('T')[0] + 'T00:00:00.000Z'
+            data.data.finishHour = data.data.finishHour.split('T')[0] + 'T23:59:59.999Z'
+        }
+
         const respose = await db.updateCalendarTasks(data.data, data.data.id)
         async function Calendar() {
 
