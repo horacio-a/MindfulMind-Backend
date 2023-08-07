@@ -46,14 +46,14 @@ const tasksForInsert = [
         "tasksName": "RandomTask0",
         completed: 1,
         updateDate: timeStamp,
-        Orden: 0
+        Orden: 0 + 1
     },
     {
         "user": "UserForTasks",
         "tasksName": "RandomTask1",
         completed: 1,
         updateDate: timeStamp,
-        Orden: 1
+        Orden: 1 + 1
 
     },
     {
@@ -61,21 +61,21 @@ const tasksForInsert = [
         "tasksName": "RandomTask2",
         completed: 1,
         updateDate: timeStamp,
-        Orden: 2
+        Orden: 2 + 1
     },
     {
         "user": "UserForTasks",
         "tasksName": "RandomTask3",
         completed: 1,
         updateDate: timeStamp,
-        Orden: 3
+        Orden: 3 + 1
     },
     {
         "user": "UserForTasks",
         "tasksName": "RandomTask4",
         completed: 1,
         updateDate: timeStamp,
-        Orden: 4
+        Orden: 4 + 1
     },
 ]
 
