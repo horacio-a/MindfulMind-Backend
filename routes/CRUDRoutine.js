@@ -129,7 +129,7 @@ router.post('/completeTask', async function (req, res, next) {
                 }
                 return (obj)
             }
-            res.status(200).json({ newdata: await Tasks(), work: true, change: 0, })
+            res.status(200).json(await Tasks())
 
         } else {
             const obj = { id: dataReq.id, user: dataReq.user, tasksName: dataReq.tasksName, completed: 0, updateDate: timeStamp }
