@@ -232,9 +232,8 @@ router.post('/update', async function (req, res, next) {
     if (data !== undefined) {
         const respose = await db.updateCalendarTasks(data.data, data.data.id)
         async function Calendar() {
-            const user = RequestData.Calendar.user
-            const idCalendar = RequestData.Calendar.idCalendar
-            const calendarTasks = await db.getCalendarTaskByUser(user, idCalendar)
+
+            const calendarTasks = await db.getCalendarTaskByUser(data.data.user, data.data.idCalendar)
             function obtenerDiasDelMes() {
                 let ID = 1
                 const fechaActual = new Date(); // Obtener la fecha actual
