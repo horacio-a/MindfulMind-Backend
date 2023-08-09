@@ -64,7 +64,9 @@ app.use(function (err, req, res, next) {
 var axios = require('axios');
 const schedule = require('node-schedule');
 const transporter = require('./nodeMailer/mailerconfig')
-
+const db = require('./models/dbInteraction')
+var fs = require('fs');
+var handlebars = require('handlebars');
 
 const restartRoutineJob = schedule.scheduleJob('0 0 * * *', async function () {
   const response = await axios.get('http://localhost:3500/restartRoutine')
@@ -84,6 +86,88 @@ const restartRoutineJob = schedule.scheduleJob('0 0 * * *', async function () {
   }
 })
 
+
+
+
+const sendNotificationJob = schedule.scheduleJob('* * * * *', async function () {
+  const date = (Math.trunc(new Date().getTime() / 1000) * 1000) - (10800000)
+  const plus1Minute = date + 60000
+  console.log(date, plus1Minute)
+  const response = await db.getdataforSendNotification(date, plus1Minute)
+  console.log(response)
+
+  var hash = {};
+  const arrForEmail = response.filter(function (current) {
+    var exists = !hash[current.id];
+    hash[current.id] = true;
+    return exists;
+  });
+
+  var readHTMLFile = function (path, callback) {
+    fs.readFile(path, { encoding: 'utf-8' }, function (err, html) {
+      if (err) {
+        callback(err);
+      }
+      else {
+        callback(null, html);
+      }
+    });
+  };
+  arrForEmail.forEach(element => {
+    readHTMLFile(__dirname + '/views/notificationTemplete.html', async function (err, html) {
+      if (err) {
+        console.log('error reading file', err);
+        return;
+      }
+      var template = handlebars.compile(html);
+      var replacements = {
+        title: element.title,
+        intialHour: new Date(element.intialHour).toLocaleString('es-AR'),
+        finishHour: new Date(element.finishHour).toLocaleString('es-AR'),
+        description: element.description,
+      };
+      var htmlToSend = template(replacements);
+      var mailOptions = {
+        from: 'mindfulmindsuport@gmail.com',
+        to: element.email,
+        subject: `Tienes un recordario`,
+        html: htmlToSend
+      };
+      if (process.env.NODE_ENV !== 'test') {
+        transporter.sendMail(mailOptions, function (error, response) {
+          console.log(response.messageId)
+          if (error) {
+            console.log(error);
+          }
+        });
+      }
+    });
+  });
+
+  const arrForNotification = []
+  response.forEach(element => {
+    if (element.NotificationToken !== 'NoCreado') {
+      let obj = {
+        "title": element.title,
+        "Body": element.intialHour,
+        "pushToken": element.NotificationToken,
+        "data": {
+          "withSome": "data"
+        }
+      }
+      arrForNotification.push(obj)
+    }
+  });
+  const httpQuery = await axios.post('http://localhost:3500/SendNotification', arrForNotification)
+  console.log(httpQuery.data)
+
+})
+
+
+
+
+
+
 var port = (process.env.PORT || '3000');
 
 
@@ -92,4 +176,4 @@ const server = app.listen(port, () => {
 })
 
 
-module.exports = { app, server, restartRoutineJob };
+module.exports = { app, server, restartRoutineJob, sendNotificationJob };
