@@ -292,7 +292,22 @@ async function updateCalendarTasks(data, id) {
 }
 
 
-
+async function getdataforSendNotification(date, plus1Minute) {
+    try {
+        let query = `SELECT calendar.id, calendar.title, calendar.description, calendar.intialHour, calendar.finishHour,
+        usersnotificationtoken.NotificationToken, usersnotificationtoken.user, calendar.notificationFilter,
+        users.email
+        FROM calendar
+        INNER JOIN usersnotificationtoken ON calendar.user = usersnotificationtoken.user
+        INNER JOIN users ON calendar.user = users.user
+        WHERE calendar.notificationFilter >= ${date} and calendar.notificationFilter < ${plus1Minute};
+        `
+        let rows = await pool.query(query)
+        return rows
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 
 
@@ -367,10 +382,11 @@ async function RestartText() {
 
 module.exports = {
     GetTextByUsers, getCalendarTaskByUser, InsertUser, InsertNewTask,
-    GetTaskByUsers, GetLoginByUserAndPassword, checkExistence,
+    GetTaskByUsers, GetLoginByUserAndPassword, checkExistence, RestartText,
     GetTaskForCheck, updateStateTask, restartRoutine, InsertCalendarTask,
     GetLastNumberOrder, ReOrderTasks, DeleteTasks, InsertCalendarTaskWithQuery,
     UpdateTokenForUser, checkAuthcode, changePassword, CheckPreviousPasswordChange,
     ConfirmRegister, ChangeProfilePicture, ChangeAllUsername, createText, UpdateText,
-    deleteText, updateCalendarTasks, RestartUsers, DeleteAllRoutine, RestartText, DeleteAllCalendar
+    deleteText, updateCalendarTasks, RestartUsers, DeleteAllRoutine, DeleteAllCalendar,
+    getdataforSendNotification,
 }
