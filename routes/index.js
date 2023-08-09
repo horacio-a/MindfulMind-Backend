@@ -105,9 +105,9 @@ router.post('/SendNotification', async function (req, res, next) {
 
         res.json(tickets)
     } else {
-        res.status(400).json({ err: 'Empty body' })
-    }
+        res.json({ err: 'Empty body' })
 
+    }
 
 })
 
