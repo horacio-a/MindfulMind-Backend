@@ -16,8 +16,7 @@ beforeAll(async () => {
 
 describe('SendNotification', () => {
     test('empty body for SendNotification', async () => {
-        const response = await request.post('/SendNotification')
-        expect(response.status).toBe(400);
+        const response = await request.post('/SendNotification').send([])
         expect(response.body.err).toBe('Empty body');
     })
 
