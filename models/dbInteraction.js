@@ -142,6 +142,18 @@ async function deleteUsernotificationByName(user) {
 
 
 
+async function insertNotificationToken(data) {
+    try {
+        let query = 'INSERT INTO usersnotificationtoken set ?'
+        let rows = await pool.query(query, [data])
+        return rows
+
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
 
 
 async function getCalendarTaskByUser(user, idCalendar) {
@@ -421,5 +433,5 @@ module.exports = {
     UpdateTokenForUser, checkAuthcode, changePassword, CheckPreviousPasswordChange,
     ConfirmRegister, ChangeProfilePicture, ChangeAllUsername, createText, UpdateText,
     deleteText, updateCalendarTasks, RestartUsers, DeleteAllRoutine, DeleteAllCalendar,
-    getdataforSendNotification, deleteUserByName, deleteUsernotificationByName
+    getdataforSendNotification, deleteUserByName, deleteUsernotificationByName, insertNotificationToken
 }
