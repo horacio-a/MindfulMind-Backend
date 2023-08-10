@@ -13,21 +13,27 @@ router.post('/login', async function (req, res, next) {
         const user = req.body.user
         const password = req.body.password
         const data = await db.GetLoginByUserAndPassword(user, md5(password))
-
         if (data !== undefined) {
-            if (data.ConfirmRegister != 1) {
+            if (data[0].ConfirmRegister != 1) {
                 res.status(200).json({
                     authentication: false,
                     errMsg: 'Email no confirmado, porfavor ingrese a su email y confirme su cuenta',
                 })
             } else {
-                res.status(200).json({
+                let response = {
                     authentication: true,
-                    user: data.user,
-                    email: data.email,
-                    profilePicture: data.profilePicture,
-                    tutorial: data.tutorial
-                })
+                    user: data[0].user,
+                    email: data[0].email,
+                    profilePicture: data[0].profilePicture,
+                    tutorial: data[0].tutorial,
+                    notificationTokens: [],
+                }
+
+                data.forEach(element => {
+                    response.notificationTokens.push(element.NotificationToken)
+                });
+
+                res.status(200).json(response)
             }
 
         } else {
@@ -60,52 +66,63 @@ router.post('/register', async function (req, res, next) {
             let obj = {
                 user: data.user,
                 password: md5(data.password),
-                email: data.email,
+                email: (data.email).toLowerCase(),
                 ConfirmRegister: 0,
                 token: generarCodigoAleatorio(),
                 PrevToken: generarCodigoAleatorio(),
             }
-            let response = await db.InsertUser(obj)
-            var readHTMLFile = function (path, callback) {
-                fs.readFile(path, { encoding: 'utf-8' }, function (err, html) {
-                    if (err) {
-                        callback(err);
-                    }
-                    else {
-                        callback(null, html);
-                    }
-                });
-            };
-
-
-
-            readHTMLFile(__dirname + '/../views/templeteRegister.html', async function (err, html) {
-                if (err) {
-                    console.log('error reading file', err);
-                    return;
-                }
-                var template = handlebars.compile(html);
-                var replacements = {
-                    Link: ` https://api.mindfulmind.com.ar/user/registerConfirmation/${data.user}/${data.email}`
-                };
-                var htmlToSend = template(replacements);
-                var mailOptions = {
-                    from: 'mindfulmindsuport@gmail.com',
-                    to: data.email,
-                    subject: "Creaste tu cuenta en mindfulmind",
-                    html: htmlToSend
-                };
-                if (process.env.NODE_ENV !== 'test') {
-                    transporter.sendMail(mailOptions, function (error, response) {
-                        console.log(response.messageId)
-                        if (error) {
-                            console.log(error);
+            let notificationData = {
+                user: data.user,
+                NotificationToken: 'NoCreado',
+            }
+            let response = await db.InsertUser(obj, notificationData)
+            if (response !== undefined) {
+                var readHTMLFile = function (path, callback) {
+                    fs.readFile(path, { encoding: 'utf-8' }, function (err, html) {
+                        if (err) {
+                            callback(err);
+                        }
+                        else {
+                            callback(null, html);
                         }
                     });
-                }
-            });
+                };
 
-            res.status(200).json({ response, userCreate: true })
+
+
+                readHTMLFile(__dirname + '/../views/templeteRegister.html', async function (err, html) {
+                    if (err) {
+                        console.log('error reading file', err);
+                        return;
+                    }
+                    var template = handlebars.compile(html);
+                    var replacements = {
+                        Link: ` https://api.mindfulmind.com.ar/user/registerConfirmation/${data.user}/${data.email}`
+                    };
+                    var htmlToSend = template(replacements);
+                    var mailOptions = {
+                        from: 'mindfulmindsuport@gmail.com',
+                        to: data.email,
+                        subject: "Creaste tu cuenta en mindfulmind",
+                        html: htmlToSend
+                    };
+                    if (process.env.NODE_ENV !== 'test') {
+                        transporter.sendMail(mailOptions, function (error, response) {
+                            console.log(response.messageId)
+                            if (error) {
+                                console.log(error);
+                            }
+                        });
+                    }
+                });
+
+                res.status(200).json({ response, userCreate: true })
+            } else {
+                db.deleteUsernotificationByName(data.user)
+                db.deleteUserByName(data.user)
+                res.status(400).json({ err: true, errMsg: 'Error creando la cuenta, intente mas tarde' })
+            }
+
         } else {
             let ErrorResponse = { error: { email: false, user: false }, userCreate: false }
             for (let i = 0; i < check.length; i++) {
@@ -125,6 +142,8 @@ router.post('/register', async function (req, res, next) {
     }
 
 })
+
+router.post('/logout')
 
 // lOGIN AND REGISTER SIMPLE --------------------------------------
 
