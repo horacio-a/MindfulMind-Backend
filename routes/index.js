@@ -111,6 +111,17 @@ router.post('/SendNotification', async function (req, res, next) {
 
 })
 
+
+router.post('/setNotificationToken', async function (req, res, next) {
+    const data = req.body
+    if (data !== undefined) {
+        const response = await db.insertNotificationToken(data)
+        res.status(200).json(response)
+    } else {
+        res.status(400).json({ err: 'Empty body' })
+    }
+})
+
 // END POINT CALLED BY BACKEND --------------------------------------
 
 
