@@ -80,9 +80,9 @@ async function GetTextByUsers(user) {
 
 async function GetLoginByUserAndPassword(user, password) {
     try {
-        var query = 'select * from users WHERE user = ? and password = ?'
-        var rows = await pool.query(query, [user, password])
-        return rows[0]
+        let query = `SELECT * FROM users INNER JOIN usersnotificationtoken ON users.user = usersnotificationtoken.user WHERE users.user = '${user}' and users.password =  '${password}';`
+        var rows = await pool.query(query)
+        return rows
     } catch (error) {
         console.log(error)
     }
@@ -101,15 +101,48 @@ async function checkExistence(user, email) {
 }
 
 
-async function InsertUser(obj) {
+async function InsertUser(obj, notificationData) {
     try {
-        var query = 'insert into users set ?';
-        var rows = await pool.query(query, [obj])
+        let queryUsers = 'INSERT INTO users set ?'
+        let queryNotification = 'INSERT INTO usersnotificationtoken set ?'
+        let rows = undefined
+        let responseQueryUsers = await pool.query(queryUsers, [obj])
+        let responseQueryNotification = await pool.query(queryNotification, [notificationData])
+        console.log(responseQueryNotification, responseQueryUsers)
+        if (responseQueryNotification !== undefined && responseQueryUsers !== undefined) {
+            rows = [responseQueryNotification, responseQueryUsers]
+        }
         return rows
     } catch (error) {
         console.log(error)
     }
 }
+
+async function deleteUserByName(user) {
+    try {
+        let query = `DELETE FROM users where user = ?`
+        let rows = await pool.query(query, [user])
+        return rows
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
+async function deleteUsernotificationByName(user) {
+    try {
+        let query = `DELETE FROM usersnotificationtoken where user = ?`
+        let rows = await pool.query(query, [user])
+        return rows
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
+
+
+
 
 async function getCalendarTaskByUser(user, idCalendar) {
     try {
@@ -388,5 +421,5 @@ module.exports = {
     UpdateTokenForUser, checkAuthcode, changePassword, CheckPreviousPasswordChange,
     ConfirmRegister, ChangeProfilePicture, ChangeAllUsername, createText, UpdateText,
     deleteText, updateCalendarTasks, RestartUsers, DeleteAllRoutine, DeleteAllCalendar,
-    getdataforSendNotification,
+    getdataforSendNotification, deleteUserByName, deleteUsernotificationByName
 }
