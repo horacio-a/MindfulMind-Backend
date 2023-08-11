@@ -13,7 +13,7 @@ router.post('/login', async function (req, res, next) {
         const user = req.body.user
         const password = req.body.password
         const data = await db.GetLoginByUserAndPassword(user, md5(password))
-        if (data !== undefined) {
+        if (data[0] !== undefined) {
             if (data[0].ConfirmRegister != 1) {
                 res.status(200).json({
                     authentication: false,
@@ -43,6 +43,7 @@ router.post('/login', async function (req, res, next) {
             })
         }
     } catch (error) {
+        console.log(error)
         res.status(400).json({ err: true, errMsg: 'Empty body' })
     }
 
@@ -143,7 +144,16 @@ router.post('/register', async function (req, res, next) {
 
 })
 
-router.post('/logout')
+router.post('/logout', async function (req, res, next) {
+    const token = req.body.NotificationToken
+    try {
+        console.log(token)
+        const response = await db.logoutNotification(token)
+        res.status(200).json(response)
+    } catch (error) {
+        res.status(400).json({ err: true })
+    }
+})
 
 // lOGIN AND REGISTER SIMPLE --------------------------------------
 
