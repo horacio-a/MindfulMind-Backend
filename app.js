@@ -90,18 +90,18 @@ const restartRoutineJob = schedule.scheduleJob('0 0 * * *', async function () {
 
 
 const sendNotificationJob = schedule.scheduleJob('* * * * *', async function () {
-  const date = (Math.trunc(new Date().getTime() / 1000) * 1000) - (10800000)
+  const date = (Math.trunc(new Date().getTime() / 1000) * 1000)
   const plus1Minute = date + 60000
   const response = await db.getdataforSendNotification(date, plus1Minute)
 
-  var hash = {};
+  let hash = {};
   const arrForEmail = response.filter(function (current) {
-    var exists = !hash[current.id];
+    let exists = !hash[current.id];
     hash[current.id] = true;
     return exists;
   });
 
-  var readHTMLFile = function (path, callback) {
+  let readHTMLFile = function (path, callback) {
     fs.readFile(path, { encoding: 'utf-8' }, function (err, html) {
       if (err) {
         callback(err);
