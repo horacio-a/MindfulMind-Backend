@@ -92,9 +92,7 @@ const restartRoutineJob = schedule.scheduleJob('0 0 * * *', async function () {
 const sendNotificationJob = schedule.scheduleJob('* * * * *', async function () {
   const date = (Math.trunc(new Date().getTime() / 1000) * 1000) - (10800000)
   const plus1Minute = date + 60000
-  console.log(date, plus1Minute)
   const response = await db.getdataforSendNotification(date, plus1Minute)
-  console.log(response)
 
   var hash = {};
   const arrForEmail = response.filter(function (current) {
