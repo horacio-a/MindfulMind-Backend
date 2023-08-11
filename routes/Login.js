@@ -148,7 +148,7 @@ router.post('/logout', async function (req, res, next) {
     const token = req.body.NotificationToken
     try {
         console.log(token)
-        const response = await db.logoutNotification(token)
+        const response = await db.deleteNotificationToken(token)
         res.status(200).json(response)
     } catch (error) {
         res.status(400).json({ err: true })
