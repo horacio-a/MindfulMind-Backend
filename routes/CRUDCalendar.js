@@ -244,6 +244,21 @@ router.post('/update', async function (req, res, next) {
 
 })
 
+router.delete('/delete', async function (req, res, next) {
+    const data = req.body
+    if (data !== undefined) {
+
+        const response = await db.deleteCalendarTasks(data.user, data.id)
+
+        res.status(200).json(response)
+    } else {
+        res.status(400).json({
+            err: true,
+            errMsg: 'Empty body'
+        })
+    }
+})
+
 // CRUD CALENDAR ------------------------------------------------------------
 
 
