@@ -40,7 +40,7 @@ router.post('/SendNotification', async function (req, res, next) {
                 to: item.pushToken,
                 sound: 'default',
                 body: item.Body,
-                data: { withSome: 'data' },
+                data: { withSome: item.pushToken },
             })
         }
 
@@ -50,9 +50,9 @@ router.post('/SendNotification', async function (req, res, next) {
             for (let chunk of chunks) {
                 try {
                     let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-                    console.log(ticketChunk);
                     for (let i = 0; i < ticketChunk.length; i++) {
                         const element = ticketChunk[i];
+                        element.to = chunk[i].to
                         tickets.push(element)
                     }
 
@@ -64,15 +64,18 @@ router.post('/SendNotification', async function (req, res, next) {
         await intnto()
 
 
-        let receiptIds = [];
+        let receiptIds = { ids: [], data: [] };
         for (let ticket of tickets) {
             if (ticket.id) {
-                receiptIds.push(ticket.id);
+                receiptIds.ids.push(ticket.id);
+                receiptIds.data.push(ticket.to)
             }
         }
 
-        let receiptIdChunks = expo.chunkPushNotificationReceiptIds(receiptIds);
-        (async () => {
+        let receiptIdChunks = expo.chunkPushNotificationReceiptIds(receiptIds.ids);
+        let errorChuck = []
+
+        async function checkError() {
             // Like sending notifications, there are different strategies you could use
             // to retrieve batches of receipts from the Expo service.
             for (let chunk of receiptIdChunks) {
@@ -86,6 +89,8 @@ router.post('/SendNotification', async function (req, res, next) {
                         if (status === 'ok') {
                             continue;
                         } else if (status === 'error') {
+
+
                             console.error(
                                 `There was an error sending a notification: ${message}`
                             );
@@ -94,14 +99,36 @@ router.post('/SendNotification', async function (req, res, next) {
                                 // https://docs.expo.io/push-notifications/sending-notifications/#individual-errors
                                 // You must handle the errors appropriately.
                                 console.error(`The error code is ${details.error}`);
+
+                                if (details.error === 'DeviceNotRegistered') {
+                                    errorChuck.push(receiptId)
+                                }
                             }
+
+
                         }
                     }
                 } catch (error) {
                     console.error(error);
                 }
             }
-        })();
+        }
+
+        await checkError()
+
+        try {
+            if (errorChuck[0] !== undefined) {
+
+                for (let i = 0; i < errorChuck.length; i++) {
+                    const element = errorChuck[i];
+                    const index = receiptIds.ids.findIndex((e) => e === element)
+                    await db.deleteNotificationToken(receiptIds.data[index])
+                }
+
+            }
+        } catch (error) {
+            console.log(error)
+        }
 
         res.json(tickets)
     } else {
