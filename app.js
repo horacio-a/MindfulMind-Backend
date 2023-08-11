@@ -157,7 +157,6 @@ const sendNotificationJob = schedule.scheduleJob('* * * * *', async function () 
     }
   });
   const httpQuery = await axios.post('http://localhost:3500/SendNotification', arrForNotification)
-  console.log(httpQuery.data)
 
 })
 
