@@ -164,16 +164,6 @@ async function deleteNotificationToken(token) {
     }
 }
 
-async function logoutNotification(token) {
-    try {
-        let query = `DELETE FROM usersnotificationtoken where NotificationToken = '${token}'`
-        let rows = await pool.query(query)
-        return rows
-    } catch (error) {
-        console.log(error)
-    }
-}
-
 
 async function getCalendarTaskByUser(user, idCalendar) {
     try {
@@ -453,5 +443,5 @@ module.exports = {
     ConfirmRegister, ChangeProfilePicture, ChangeAllUsername, createText, UpdateText,
     deleteText, updateCalendarTasks, RestartUsers, DeleteAllRoutine, DeleteAllCalendar,
     getdataforSendNotification, deleteUserByName, deleteUsernotificationByName, insertNotificationToken,
-    deleteNotificationToken, logoutNotification
+    deleteNotificationToken
 }
