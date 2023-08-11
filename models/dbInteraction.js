@@ -165,15 +165,6 @@ async function deleteNotificationToken(token) {
 }
 
 
-async function getCalendarTaskByUser(user, idCalendar) {
-    try {
-        var query = 'SELECT * FROM calendar WHERE USER = ? and idCalendar = ? ORDER BY `calendar`.`intialHour` ASC';
-        var rows = await pool.query(query, [user, idCalendar])
-        return rows
-    } catch (error) {
-        console.log(error)
-    }
-}
 
 
 
@@ -197,6 +188,44 @@ async function InsertCalendarTask(obj) {
         console.log(error)
     }
 }
+
+async function getCalendarTaskByUser(user, idCalendar) {
+    try {
+        var query = 'SELECT * FROM calendar WHERE USER = ? and idCalendar = ? ORDER BY `calendar`.`intialHour` ASC';
+        var rows = await pool.query(query, [user, idCalendar])
+        return rows
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function updateCalendarTasks(data, id) {
+    try {
+        let query = `UPDATE calendar SET ? WHERE id = ${id}`
+        let rows = await pool.query(query, [data])
+        return rows
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
+
+async function deleteCalendarTasks(user, id) {
+    try {
+        let query = `DELETE FROM calendar WHERE user = ? and id = ?`
+        let rows = await pool.query(query, [user, id])
+        return rows
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
+
+
+
+
 
 async function InsertCalendarTaskWithQuery(query) {
     try {
@@ -334,16 +363,6 @@ async function deleteText(user, id) {
     }
 }
 
-async function updateCalendarTasks(data, id) {
-    try {
-        let query = `UPDATE calendar SET ? WHERE id = ${id}`
-        let rows = await pool.query(query, [data])
-        return rows
-    } catch (error) {
-        console.log(error)
-
-    }
-}
 
 
 async function getdataforSendNotification(date, plus1Minute) {
@@ -443,5 +462,5 @@ module.exports = {
     ConfirmRegister, ChangeProfilePicture, ChangeAllUsername, createText, UpdateText,
     deleteText, updateCalendarTasks, RestartUsers, DeleteAllRoutine, DeleteAllCalendar,
     getdataforSendNotification, deleteUserByName, deleteUsernotificationByName, insertNotificationToken,
-    deleteNotificationToken
+    deleteNotificationToken, deleteCalendarTasks
 }
