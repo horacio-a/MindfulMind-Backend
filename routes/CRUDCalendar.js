@@ -246,6 +246,7 @@ router.post('/update', async function (req, res, next) {
 
 router.delete('/delete', async function (req, res, next) {
     const data = req.body
+    console.log(data)
     if (data !== undefined) {
 
         const response = await db.deleteCalendarTasks(data.user, data.id)
