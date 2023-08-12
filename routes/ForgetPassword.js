@@ -133,6 +133,64 @@ router.post('/ChangePassword', async function (req, res, next) {
 
 
 })
+
+router.post('/forgetUser', async function (req, res, next) {
+    const data = req.body
+    if (data.user !== undefined && data.email !== undefined) {
+        const check = await db.checkExistence(data.user, data.email)
+        if (check[0] !== undefined) {
+            var readHTMLFile = function (path, callback) {
+                fs.readFile(path, { encoding: 'utf-8' }, function (err, html) {
+                    if (err) {
+                        callback(err);
+                    }
+                    else {
+                        callback(null, html);
+                    }
+                });
+            };
+
+
+            readHTMLFile(__dirname + '/../views/ForgotUserTemplete.html', async function (err, html) {
+                if (err) {
+                    console.log('error reading file', err);
+                    return;
+                }
+                var template = handlebars.compile(html);
+                var replacements = {
+                    user: check[0].user
+                };
+                var htmlToSend = template(replacements);
+                var mailOptions = {
+                    from: 'mindfulmindsuport@gmail.com',
+                    to: data.email,
+                    subject: "Olvidates tu contraseña mindfulmind",
+                    html: htmlToSend
+                };
+                transporter.sendMail(mailOptions, function (error, response) {
+                    console.log(response.messageId)
+                    if (error) {
+                        console.log(error);
+                    }
+                });
+            });
+
+
+            res.status(200).json(check)
+        } else {
+            res.json({
+                error: 'Email no encontrado'
+            })
+        }
+
+    } else {
+        res.json({
+            error: 'datos requeridos no dados'
+        })
+    }
+
+})
+
 // Forgot password from register --------------------------------------
 
 module.exports = router;
