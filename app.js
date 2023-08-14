@@ -92,7 +92,6 @@ const restartRoutineJob = schedule.scheduleJob('0 0 * * *', async function () {
 const sendNotificationJob = schedule.scheduleJob('* * * * *', async function () {
   const date = (Math.trunc(new Date().getTime() / 1000) * 1000)
   const plus1Minute = date + 60000
-  console.log(date, plus1Minute)
   const response = await db.getdataforSendNotification(date, plus1Minute)
 
   let hash = {};
@@ -158,7 +157,6 @@ const sendNotificationJob = schedule.scheduleJob('* * * * *', async function () 
     }
   });
   const httpQuery = await axios.post('http://localhost:3500/SendNotification', arrForNotification)
-  console.log(httpQuery.data)
 })
 
 
