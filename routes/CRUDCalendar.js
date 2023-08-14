@@ -18,10 +18,33 @@ router.post('/create', async function (req, res, next) {
         })
     } else {
 
+
         if (!obj.info.Allday) {
             obj.data.intialHour = obj.data.intialHour.split('T')[0] + 'T00:00:00.000Z'
             obj.data.finishHour = obj.data.finishHour.split('T')[0] + 'T23:59:59.999Z'
         }
+
+        function generarCodigo() {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let codigo = '';
+
+            for (let i = 0; i < 3; i++) {
+                codigo += characters[Math.floor(Math.random() * characters.length)];
+            }
+            codigo += '-';
+
+            for (let i = 0; i < 3; i++) {
+                codigo += characters[Math.floor(Math.random() * characters.length)];
+            }
+            codigo += '-';
+
+            for (let i = 0; i < 3; i++) {
+                codigo += characters[Math.floor(Math.random() * characters.length)];
+            }
+            return codigo;
+        }
+        const codigoGenerado = generarCodigo();
+
 
         switch (obj.info.repeat) {
             case 'Todas las semanas':
@@ -55,6 +78,7 @@ router.post('/create', async function (req, res, next) {
                 for (let i = 0; i < fechasIguales.length; i++) {
                     const element = fechasIguales[i];
                     newdata.push({
+                        GroupId: codigoGenerado,
                         "user": obj.data.user,
                         "Title": obj.data.Title,
                         "intialHour": element.toISOString().split('T')[0] + 'T' + obj.data.intialHour.split('T')[1],
@@ -95,6 +119,7 @@ router.post('/create', async function (req, res, next) {
                 for (let i = 0; i < fechasEnCadaMes.length; i++) {
                     const element = fechasEnCadaMes[i];
                     newdata.push({
+                        GroupId: codigoGenerado,
                         "user": obj.data.user,
                         "Title": obj.data.Title,
                         "intialHour": element.toISOString().split('T')[0] + 'T' + obj.data.intialHour.split('T')[1],
@@ -140,6 +165,7 @@ router.post('/create', async function (req, res, next) {
                 for (let i = 0; i < fechasProximos10Anios.length; i++) {
                     const element = fechasProximos10Anios[i];
                     newdata.push({
+                        GroupId: codigoGenerado,
                         "user": obj.data.user,
                         "Title": obj.data.Title,
                         "intialHour": element.toISOString().split('T')[0] + 'T' + obj.data.intialHour.split('T')[1],
@@ -155,6 +181,7 @@ router.post('/create', async function (req, res, next) {
                 break;
             default:
                 newdata.push({
+                    GroupId: codigoGenerado,
                     "user": obj.data.user,
                     "Title": obj.data.Title,
                     "intialHour": obj.data.intialHour,
@@ -206,10 +233,10 @@ router.post('/create', async function (req, res, next) {
 
         function createQuery(data) {
             const arryQuery = []
-            arryQuery.push('INSERT INTO calendar (user, title, description, date, intialHour, finishHour, colorHex, category, idCalendar, notificationFilter) VALUES ')
+            arryQuery.push('INSERT INTO calendar (GroupId, user, title, description, date, intialHour, finishHour, colorHex, category, idCalendar, notificationFilter) VALUES ')
             for (let i = 0; i < data.length; i++) {
                 const element = data[i];
-                arryQuery.push(`("${element.user}" , "${element.Title}", "${element.description}", "${element.date}", "${element.intialHour}", "${element.finishHour}", "${element.colorHex}", "${element.category}", "${element.idCalendar}", ${element.notificationFilter} )`)
+                arryQuery.push(`("${element.GroupId}" , "${element.user}" , "${element.Title}", "${element.description}", "${element.date}", "${element.intialHour}", "${element.finishHour}", "${element.colorHex}", "${element.category}", "${element.idCalendar}", ${element.notificationFilter} )`)
                 if (i !== data.length - 1) {
                     arryQuery.push(',')
                 }
