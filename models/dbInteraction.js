@@ -199,6 +199,16 @@ async function getCalendarTaskByUser(user, idCalendar) {
     }
 }
 
+async function getCalendarTaskByGroup(user, idCalendar, GroupId) {
+    try {
+        var query = 'SELECT * FROM calendar WHERE USER = ? and idCalendar = ? and GroupId = ? ORDER BY `calendar`.`intialHour` ASC';
+        var rows = await pool.query(query, [user, idCalendar, GroupId])
+        return rows
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 async function updateCalendarTasks(data, id) {
     try {
         let query = `UPDATE calendar SET ? WHERE id = ${id}`
@@ -206,7 +216,16 @@ async function updateCalendarTasks(data, id) {
         return rows
     } catch (error) {
         console.log(error)
+    }
+}
 
+
+async function updateCalendarTasksByGroupId(query) {
+    try {
+        let rows = await pool.query(query, [])
+        return rows
+    } catch (error) {
+        console.log(error)
     }
 }
 
@@ -214,6 +233,17 @@ async function updateCalendarTasks(data, id) {
 async function deleteCalendarTasks(user, id) {
     try {
         let query = `DELETE FROM calendar WHERE user = ? and id = ?`
+        let rows = await pool.query(query, [user, id])
+        return rows
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
+async function deleteCalendarTasksByGroup(user, id) {
+    try {
+        let query = `DELETE FROM calendar WHERE user = ? and GroupId = ?`
         let rows = await pool.query(query, [user, id])
         return rows
     } catch (error) {
@@ -462,5 +492,6 @@ module.exports = {
     ConfirmRegister, ChangeProfilePicture, ChangeAllUsername, createText, UpdateText,
     deleteText, updateCalendarTasks, RestartUsers, DeleteAllRoutine, DeleteAllCalendar,
     getdataforSendNotification, deleteUserByName, deleteUsernotificationByName, insertNotificationToken,
-    deleteNotificationToken, deleteCalendarTasks
+    deleteNotificationToken, deleteCalendarTasks, updateCalendarTasksByGroupId, getCalendarTaskByGroup,
+    deleteCalendarTasksByGroup
 }
