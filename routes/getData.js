@@ -6,7 +6,6 @@ var db = require('../models/dbInteraction')
 
 router.post('/all', async function (req, res, next) {
     const RequestData = req.body.obj
-    console.log(RequestData)
     if (RequestData == undefined) {
         res.status(400).json({ err: 'err en los datos' })
     } else {
@@ -108,9 +107,15 @@ router.post('/all', async function (req, res, next) {
                                 const element = calendarTasks[index];
                                 taksDate = new Date(calendarTasks[index].date)
                                 if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
-                                    taresEsteDia = true
-                                    DaysTask.push(element)
+                                    let groupedTask = false
 
+                                    const found = calendarTasks.find((e) => e.GroupId === element.GroupId && e.id !== element.id)
+                                    if (found !== undefined) {
+                                        groupedTask = true
+                                    }
+                                    taresEsteDia = true
+                                    element.groupedTask = groupedTask
+                                    DaysTask.push(element)
                                 }
                             }
                             if (taresEsteDia === true) {
@@ -138,7 +143,14 @@ router.post('/all', async function (req, res, next) {
                                 const element = calendarTasks[index];
                                 taksDate = new Date(calendarTasks[index].date)
                                 if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
+                                    let groupedTask = false
+
+                                    const found = calendarTasks.find((e) => e.GroupId === element.GroupId && e.id !== element.id)
+                                    if (found !== undefined) {
+                                        groupedTask = true
+                                    }
                                     taresEsteDia = true
+                                    element.groupedTask = groupedTask
                                     DaysTask.push(element)
                                 }
                             }
@@ -225,7 +237,6 @@ router.get('/text/:users', async function (req, res, next) {
 })
 
 router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
-
     async function Calendar() {
         const user = req.params.user
         const idCalendar = req.params.idCalendar
@@ -245,17 +256,28 @@ router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
             for (let i = primerDia.getDate(); i <= ultimoDia.getDate(); i++) {
                 const DaysTask = []
                 let taresEsteDia = false
-                const fecha = new Date(año, mes, i); // Crear una fecha con el día actual
+
+                const fecha = new Date(año, mes, i);
+
                 const diaSemana = fecha.toLocaleDateString('es-ES', { weekday: 'long' }); // Obtener el día de la semana como una cadena de texto
                 for (let index = 0; index < calendarTasks.length; index++) {
                     const element = calendarTasks[index];
-
                     taksDate = new Date(element.date)
+
                     if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
+                        let groupedTask = false
+
+                        const found = calendarTasks.find((e) => e.GroupId === element.GroupId && e.id !== element.id)
+                        if (found !== undefined) {
+                            groupedTask = true
+                        }
                         taresEsteDia = true
+                        element.groupedTask = groupedTask
                         DaysTask.push(element)
                     }
                 }
+
+
                 if (fecha.getDate() == fechaActual.getDate()) {
                     if (taresEsteDia === true) {
                         diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: true, requestTask: true, Tasks: DaysTask });
@@ -296,9 +318,15 @@ router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
                             const element = calendarTasks[index];
                             taksDate = new Date(calendarTasks[index].date)
                             if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
-                                taresEsteDia = true
-                                DaysTask.push(element)
+                                let groupedTask = false
 
+                                const found = calendarTasks.find((e) => e.GroupId === element.GroupId && e.id !== element.id)
+                                if (found !== undefined) {
+                                    groupedTask = true
+                                }
+                                taresEsteDia = true
+                                element.groupedTask = groupedTask
+                                DaysTask.push(element)
                             }
                         }
                         if (taresEsteDia === true) {
@@ -326,7 +354,14 @@ router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
                             const element = calendarTasks[index];
                             taksDate = new Date(calendarTasks[index].date)
                             if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
+                                let groupedTask = false
+
+                                const found = calendarTasks.find((e) => e.GroupId === element.GroupId && e.id !== element.id)
+                                if (found !== undefined) {
+                                    groupedTask = true
+                                }
                                 taresEsteDia = true
+                                element.groupedTask = groupedTask
                                 DaysTask.push(element)
                             }
                         }
@@ -368,6 +403,7 @@ router.get('/calendar/:user/:idCalendar', async function (req, res, next) {
             days: obtenerDiasDelMes(),
         })
     }
+
 
     res.json(await Calendar())
 })
