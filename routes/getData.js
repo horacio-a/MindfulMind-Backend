@@ -34,8 +34,6 @@ router.post('/all', async function (req, res, next) {
             function obtenerDiasDelMes() {
                 let ID = 1
                 const fechaActual = new Date(); // Obtener la fecha actual
-
-                console.log(fechaActual)
                 const año = fechaActual.getFullYear(); // Obtener el año actual
                 const mes = fechaActual.getMonth(); // Obtener el mes actual (0-11)
 
@@ -48,18 +46,28 @@ router.post('/all', async function (req, res, next) {
                 for (let i = primerDia.getDate(); i <= ultimoDia.getDate(); i++) {
                     const DaysTask = []
                     let taresEsteDia = false
-                    const fecha = new Date(año, mes, i); // Crear una fecha con el día actual
+
+                    const fecha = new Date(año, mes, i);
 
                     const diaSemana = fecha.toLocaleDateString('es-ES', { weekday: 'long' }); // Obtener el día de la semana como una cadena de texto
                     for (let index = 0; index < calendarTasks.length; index++) {
                         const element = calendarTasks[index];
-
                         taksDate = new Date(element.date)
+
                         if (taksDate.getDate() == fecha.getDate() && taksDate.getMonth() == fecha.getMonth()) {
+                            let groupedTask = false
+
+                            const found = calendarTasks.find((e) => e.GroupId === element.GroupId && e.id !== element.id)
+                            if (found !== undefined) {
+                                groupedTask = true
+                            }
                             taresEsteDia = true
+                            element.groupedTask = groupedTask
                             DaysTask.push(element)
                         }
                     }
+
+
                     if (fecha.getDate() == fechaActual.getDate()) {
                         if (taresEsteDia === true) {
                             diasDelMes.push({ id: ID, number: i, diaSemana, fecha, ThisMount: true, Today: true, requestTask: true, Tasks: DaysTask });
