@@ -497,7 +497,7 @@ router.delete('/delete', async function (req, res, next) {
 
         const response = await db.deleteCalendarTasks(data.user, data.id)
 
-        res.json(await Calendar())
+        res.json(await Calendar(data.user, data.idCalendar))
     } else {
         res.status(400).json({
             err: true,
