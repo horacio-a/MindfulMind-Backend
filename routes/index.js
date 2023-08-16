@@ -138,7 +138,6 @@ router.post('/SendNotification', async function (req, res, next) {
 
 })
 
-
 router.post('/setNotificationToken', async function (req, res, next) {
     const data = req.body
     if (data !== undefined) {
@@ -148,6 +147,18 @@ router.post('/setNotificationToken', async function (req, res, next) {
         res.status(400).json({ err: 'Empty body' })
     }
 })
+
+router.post('/tutorialOff', async function (req, res, next) {
+    const user = req.body
+    if (user !== undefined) {
+        const response = await db.tutorialOff(user.user)
+        res.status(200).json(response)
+    } else {
+        res.status(400).json({ err: 'Empty body' })
+    }
+})
+
+
 
 // END POINT CALLED BY BACKEND --------------------------------------
 
