@@ -414,6 +414,18 @@ async function getdataforSendNotification(date, plus1Minute) {
 
 
 
+async function tutorialOff(user) {
+    try {
+        let query = `UPDATE users SET tutorial = 1 WHERE user = ?;`
+        let rows = await pool.query(query, [user])
+        return rows
+    } catch (error) {
+        console.log(error)
+
+    }
+}
+
+
 
 
 
@@ -493,5 +505,5 @@ module.exports = {
     deleteText, updateCalendarTasks, RestartUsers, DeleteAllRoutine, DeleteAllCalendar,
     getdataforSendNotification, deleteUserByName, deleteUsernotificationByName, insertNotificationToken,
     deleteNotificationToken, deleteCalendarTasks, updateCalendarTasksByGroupId, getCalendarTaskByGroup,
-    deleteCalendarTasksByGroup
+    deleteCalendarTasksByGroup, tutorialOff
 }
