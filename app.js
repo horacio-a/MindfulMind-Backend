@@ -120,8 +120,8 @@ const sendNotificationJob = schedule.scheduleJob('* * * * *', async function () 
       var template = handlebars.compile(html);
       var replacements = {
         title: element.title,
-        intialHour: new Date(element.intialHour).toLocaleString('es-AR'),
-        finishHour: new Date(element.finishHour).toLocaleString('es-AR'),
+        intialHour: `${new Date(element.intialHour).getHours() < 10 ? '0' : ''}${new Date(element.intialHour).getHours()}:${new Date(element.intialHour).getMinutes() < 10 ? '0' : ''}${new Date(element.intialHour).getMinutes()} `,
+        finishHour: `${new Date(element.finishHour).getHours() < 10 ? '0' : ''}${new Date(element.finishHour).getHours()}:${new Date(element.finishHour).getMinutes() < 10 ? '0' : ''}${new Date(element.finishHour).getMinutes()} `,
         description: element.description,
       };
       var htmlToSend = template(replacements);
