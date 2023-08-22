@@ -147,7 +147,7 @@ const sendNotificationJob = schedule.scheduleJob('* * * * *', async function () 
     if (element.NotificationToken !== 'NoCreado') {
       let obj = {
         "title": element.title,
-        "Body": element.intialHour,
+        "Body": `Recurda que a las ${new Date(element.intialHour).getHours() < 10 ? '0' : ''}${new Date(element.intialHour).getHours()}:${new Date(element.intialHour).getMinutes() < 10 ? '0' : ''}${new Date(element.intialHour).getMinutes()} tiene ${element.title}`,
         "pushToken": element.NotificationToken,
         "data": {
           "withSome": "data"
