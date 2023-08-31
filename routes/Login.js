@@ -56,9 +56,7 @@ router.post('/login/Encrypted', async function (req, res, next) {
         const user = req.body.user
         const password = req.body.password
 
-        res.json({ user, password })
         const data = await db.GetLoginByUserAndPassword(user, password)
-        console.log(data)
         if (data[0] !== undefined) {
             if (data[0].ConfirmRegister != 1) {
                 res.status(200).json({
