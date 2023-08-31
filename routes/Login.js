@@ -12,7 +12,10 @@ router.post('/login', async function (req, res, next) {
     try {
         const user = req.body.user
         const password = req.body.password
+
+        res.json({ user, password })
         const data = await db.GetLoginByUserAndPassword(user, md5(password))
+        console.log(data)
         if (data[0] !== undefined) {
             if (data[0].ConfirmRegister != 1) {
                 res.status(200).json({
@@ -23,6 +26,7 @@ router.post('/login', async function (req, res, next) {
                 let response = {
                     authentication: true,
                     user: data[0].user,
+                    password: data[0].password,
                     email: data[0].email,
                     profilePicture: data[0].profilePicture,
                     tutorial: data[0].tutorial,
@@ -45,6 +49,51 @@ router.post('/login', async function (req, res, next) {
     } catch (error) {
         console.log(error)
         res.status(400).json({ err: true, errMsg: 'Empty body' })
+    }
+
+})
+
+router.post('/login/Encrypted', async function (req, res, next) {
+    try {
+        const user = req.body.user
+        const password = req.body.password
+
+        res.json({ user, password })
+        const data = await db.GetLoginByUserAndPassword(user, password)
+        console.log(data)
+        if (data[0] !== undefined) {
+            if (data[0].ConfirmRegister != 1) {
+                res.status(200).json({
+                    authentication: false,
+                    errMsg: 'Error',
+                })
+            } else {
+                let response = {
+                    authentication: true,
+                    user: data[0].user,
+                    password: data[0].password,
+                    email: data[0].email,
+                    profilePicture: data[0].profilePicture,
+                    tutorial: data[0].tutorial,
+                    notificationTokens: [],
+                }
+
+                data.forEach(element => {
+                    response.notificationTokens.push(element.NotificationToken)
+                });
+
+                res.status(200).json(response)
+            }
+
+        } else {
+            res.json({
+                authentication: false,
+                errMsg: 'Error',
+            })
+        }
+    } catch (error) {
+        console.log(error)
+        res.status(403).json({ err: true, errMsg: 'Empty body' })
     }
 
 })
