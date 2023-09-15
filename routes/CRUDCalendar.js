@@ -410,8 +410,7 @@ router.post('/create', async function (req, res, next) {
         }
 
         db.InsertCalendarTaskWithQuery(createQuery(newdata))
-
-        res.json(newdata)
+        res.status(200).json(await Calendar(obj.data.user, obj.data.idCalendar))
     }
 
 
