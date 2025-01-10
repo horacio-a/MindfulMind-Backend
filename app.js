@@ -69,7 +69,7 @@ var fs = require('fs');
 var handlebars = require('handlebars');
 
 const restartRoutineJob = schedule.scheduleJob('0 0 * * *', async function () {
-  const response = await axios.get('http://localhost:3500/restartRoutine')
+  const response = await axios.get(`http://localhost:${process.env.PORT}/restartRoutine`)
   if (response.data.request === false) {
     var mailOptions = {
       from: 'mindfulmindsuport@gmail.com',
@@ -156,7 +156,7 @@ const sendNotificationJob = schedule.scheduleJob('* * * * *', async function () 
       arrForNotification.push(obj)
     }
   });
-  const httpQuery = await axios.post('http://localhost:3500/SendNotification', arrForNotification)
+  const httpQuery = await axios.post(`http://localhost:${process.env.PORT}/SendNotification`, arrForNotification)
 })
 
 
